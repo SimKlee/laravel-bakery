@@ -1,0 +1,14 @@
+{
+    "name": "simklee/laravel-bakery",
+    "description": "A Laravel Bakery",
+    "type": "laravel-package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "SimKlee",
+            "email": "simklee@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
