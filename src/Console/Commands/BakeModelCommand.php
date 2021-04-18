@@ -23,6 +23,6 @@ class BakeModelCommand extends GeneratorCommand
 
     public function handle(): void
     {
-$this->
+
     }
 }
