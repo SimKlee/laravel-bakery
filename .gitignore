@@ -6,3 +6,5 @@
 /.php_cs.tests.cache
 /composer.lock
 /vendor
+_ide_helper.php
+.phpstorm.meta.php
