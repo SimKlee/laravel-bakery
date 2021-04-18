@@ -3,13 +3,12 @@
 namespace SimKlee\LaravelBakery\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Console\GeneratorCommand;
 
 /**
  * Class InstallBlogPackage
  * @package SimKlee\LaravelBakery\Console\Commands
  */
-class BakeModelCommand extends GeneratorCommand
+class BakeModelCommand extends Command
 {
     /**
      * @var string
