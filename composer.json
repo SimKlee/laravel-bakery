@@ -30,7 +30,7 @@
     "extra":             {
         "laravel": {
             "providers": [
-                "SimKlee\\LaravelBakery\\LaravelBakeryServiceProvider"
+                "SimKlee\\LaravelBakery\\Providers\\LaravelBakeryServiceProvider"
             ]
         }
     }
