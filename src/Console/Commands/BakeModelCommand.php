@@ -290,8 +290,8 @@ class BakeModelCommand extends Command
         $stub->replace('model', $model)
              ->replace('models', Str::plural($model))
              ->replace('columns', $columns)
-             ->replace('indexes', null)
-             ->replace('foreignKeys', null);
+             ->replace('indexes', '')
+             ->replace('foreignKeys', '');
 
         return $stub->write($file, false) !== false;
     }
