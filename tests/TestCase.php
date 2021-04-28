@@ -2,7 +2,6 @@
 
 namespace SimKlee\LaravelBakery\Tests;
 
-use Illuminate\Foundation\Application;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use SimKlee\LaravelBakery\Providers\LaravelBakeryServiceProvider;
 
@@ -13,11 +12,13 @@ use SimKlee\LaravelBakery\Providers\LaravelBakeryServiceProvider;
 class TestCase extends BaseTestCase
 {
     /**
-     * @param Application $app
+     * Get package providers.
      *
-     * @return string[]
+     * @param  \Illuminate\Foundation\Application  $app
+     *
+     * @return array
      */
-    protected function getPackageProviders(Application $app): array
+    protected function getPackageProviders($app)
     {
         return [
             LaravelBakeryServiceProvider::class,

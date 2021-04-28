@@ -14,17 +14,17 @@ class Stub
     /**
      * @var string
      */
-    private string $stub;
+    protected $stub;
 
     /**
      * @var string
      */
-    private string $path = __DIR__ . '/../../resources/stubs/';
+    protected $path = __DIR__ . '/../../resources/stubs/';
 
     /**
      * @var string
      */
-    private string $content;
+    protected $content;
 
     /**
      * Stub constructor.
@@ -64,7 +64,7 @@ class Stub
      */
     public function replace(string $property, string $value): Stub
     {
-        $this->content = str_replace(sprintf('[[%s]]', $property), $value, $this->content);
+        $this->content = str_replace(sprintf('{{ %s }}', $property), $value, $this->content);
 
         return $this;
     }
@@ -79,11 +79,16 @@ class Stub
 
     /**
      * @param string $file
+     * @param bool   $override
      *
      * @return bool|int
      */
-    public function write(string $file)
+    public function write(string $file, bool $override = false)
     {
-        return File::put($file, $this->getContent());
+        if (!File::exists($file) || $override) {
+            return File::put($file, $this->content);
+        }
+
+        return false;
     }
 }

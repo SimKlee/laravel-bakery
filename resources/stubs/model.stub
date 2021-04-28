@@ -1,0 +1,52 @@
+<?php declare(strict_types=1);
+
+namespace App\Models;
+{{ uses }}
+/**
+ * Class {{ model }}
+ * @package App\Models
+ *
+{{ properties }}
+ */
+class {{ model }} extends {{ extends }}
+{
+    const TABLE = '{{ table }}';
+
+{{ constants }}
+
+    /**
+     * @var string
+     */
+    protected $table = self::TABLE;
+
+    /**
+     * @var bool
+     */
+    public $timestamps = {{ timestamps }};
+
+    /**
+     * @var string[]
+     */
+    protected $fillable = [];
+
+    /**
+     * @var string[]
+     */
+    protected $guarded = [
+{{ guarded }}
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $dates = [
+{{ dates }}
+    ];
+
+    /**
+     * @var array
+     */
+    protected $casts = [
+{{ casts }}
+    ];
+}

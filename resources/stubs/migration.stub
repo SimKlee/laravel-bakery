@@ -1,0 +1,33 @@
+<?php
+
+use App\Models\{{ model }};
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class Create{{ models }}Table extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create({{ model }}::TABLE, function (Blueprint $table) {
+{{ columns }}
+{{ indexes }}
+{{ foreignKeys }}
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists({{ model }}::TABLE);
+    }
+}

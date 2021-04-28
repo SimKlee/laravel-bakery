@@ -1,0 +1,13 @@
+<?php
+return [
+    'ExampleModel' => [
+        'table'      => 'example_models',
+        'columns'    => [
+            'id'               => 'integer|unsigned|ai',
+            'foreign_table_id' => 'fk',
+            'name'             => 'varchar|length:25|unique',
+            'active'           => 'boolean|default:false',
+        ],
+        'timestamps' => true,
+    ],
+];

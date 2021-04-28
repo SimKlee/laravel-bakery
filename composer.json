@@ -10,7 +10,10 @@
         }
     ],
     "minimum-stability": "dev",
-    "require":           {},
+    "prefer-stable":     true,
+    "require":           {
+        "illuminate/support": "^8"
+    },
     "require-dev":       {
         "php":                         "^7.3|^8.0",
         "barryvdh/laravel-ide-helper": "^2.9",
@@ -24,7 +27,8 @@
     },
     "autoload-dev":      {
         "psr-4": {
-            "SimKlee\\LaravelBakery\\Tests\\": "tests"
+            "SimKlee\\LaravelBakery\\Tests\\":       "tests",
+            "SimKlee\\LaravelBakery\\Tests\\Unit\\": "tests/Unit"
         }
     },
     "extra":             {

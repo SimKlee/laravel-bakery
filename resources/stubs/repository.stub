@@ -1,0 +1,14 @@
+<?php declare(strict_types=1);
+
+namespace App\Models\Repositories;
+
+use App\Models\{{ model }};
+
+/**
+ * Class {{ model }}Repository
+ * @package App\Models\Repositories
+ */
+class {{ model }}Repository extends AbstractRepository
+{
+
+}
