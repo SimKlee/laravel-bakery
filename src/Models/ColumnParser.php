@@ -277,6 +277,10 @@ class ColumnParser
                 $value = (string) $value;
                 break;
 
+            case 'bool':
+                $value = (bool) $value;
+                break;
+
             default:
                 throw new NotACastableTypeException(sprintf('Unknown type "%s" for casting.', $type));
         }

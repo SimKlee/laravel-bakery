@@ -93,6 +93,7 @@ class ColumnHelper
             'char'          => 'char',
             'text'          => 'text',
             'timestamp'     => 'timestamp',
+            'bool'          => 'boolean',
         ];
 
         if (!isset($map[ $column->dataType ])) {
