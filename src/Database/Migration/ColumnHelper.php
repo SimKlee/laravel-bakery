@@ -19,13 +19,58 @@ class ColumnHelper
      */
     public function getColumnMigration(Column $column): string
     {
-        $string = '$this->';
+        $string = "\t\t\t";
+        $string .= '$this->';
         $string .= $this->getMethod($column);
         $string .= sprintf('(%s)', $this->getMethodParams($column));
         $string .= $this->getAttributeMethods($column);
         $string .= ';';
 
         return $string;
+    }
+
+    /**
+     * @param Column $column
+     *
+     * @return string|false
+     * @throws \Exception
+     */
+    public function getColumnIndexes(Column $column)
+    {
+        $type = null;
+        if ($column->index) {
+            $type = 'index';
+        } else if ($column->unique) {
+            $type = 'unique';
+        }
+
+        if ($type) {
+            return sprintf("\t\t\t\$this->%s(['%s'], '%s');", $type, $column->name, $column->name);
+        }
+
+        return false;
+    }
+
+    public function getColumnForeignKey(Column $column)
+    {
+        if ($column->foreignKey === false) {
+            return false;
+        }
+
+        // @TODO: foreign key name: fk__product_has_insurances__product_id (fk__table__column)
+        $foreignKeyName = null;
+
+        $foreignKey = sprintf("\t\t\t\$this->foreign(%s, '%s')", $column->getPropertyString(), $foreignKeyName);
+        $foreignKey .= sprintf("\t\t\t\t->on(%s)", $column->foreignKeyColumn->model);
+        $foreignKey .= sprintf("\t\t\t\t->references(%s);", $column->foreignKeyColumn->getPropertyString());
+
+        /*
+        $table->foreign(ProductHasInsurance::PROPERTY_PRODUCT_ID, '')
+              ->on(\App\Models\Product::TABLE)
+              ->references(\App\Models\Product::PROPERTY_ID);
+        */
+
+        return $foreignKey;
     }
 
     /**

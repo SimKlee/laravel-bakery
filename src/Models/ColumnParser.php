@@ -2,8 +2,8 @@
 
 namespace SimKlee\LaravelBakery\Models;
 
+use SimKlee\LaravelBakery\Models\Exceptions\UnknwonDataTypeException;
 use SimKlee\LaravelBakery\Support\Collection;
-use Illuminate\Support\Str;
 use SimKlee\LaravelBakery\Models\Exceptions\NotACastableTypeException;
 use SimKlee\LaravelBakery\Models\Exceptions\WrongAttributeException;
 
@@ -25,6 +25,11 @@ class ColumnParser
     const INDEX_INDEX       = 'index';
     const INDEX_UNIQUE      = 'unique';
 
+    const FOREIGN_KEY_ON_UPDATE = 'onupdate';
+    const FOREIGN_KEY_ON_DELETE = 'ondelete';
+    const FOREIGN_KEY_CASCADE   = 'cascade';
+    const FOREIGN_KEY_RESTRICT  = 'restrict';
+
     /**
      * @var Column
      */
@@ -39,30 +44,68 @@ class ColumnParser
      * @var array|string[]
      */
     private $dataTypes = [
-        'integer'   => 'int',
-        'varchar'   => 'string',
-        'char'      => 'string',
-        'text'      => 'string',
-        'timestamp' => 'Carbon',
+        'tinyInteger'   => 'int',
+        'smallInteger'  => 'int',
+        'mediumInteger' => 'int',
+        'integer'       => 'int',
+        'bigInteger'    => 'int',
+        'varchar'       => 'string',
+        'char'          => 'string',
+        'text'          => 'string',
+        'decimal'       => 'float',
+        'float'         => 'float',
+        'boolean'       => 'boolean',
+        'dateTime'      => 'Carbon',
+        'date'          => 'Carbon',
+        'time'          => 'Carbon',
+        'timestamp'     => 'Carbon',
     ];
+
+    /**
+     * @var array|string[]
+     */
+    private $dataTypeAliases = [
+        'tinyint'       => 'tinyInteger',
+        'tinyInt'       => 'tinyInteger',
+        'tinyinteger'   => 'tinyInteger',
+        'smallint'      => 'smallInteger',
+        'smallInt'      => 'smallInteger',
+        'smallinteger'  => 'smallInteger',
+        'mediumint'     => 'mediumInteger',
+        'mediumInt'     => 'mediumInteger',
+        'mediuminteger' => 'mediumInteger',
+        'int'           => 'integer',
+        'biginteger'    => 'bigInteger',
+        'bigint'        => 'bigInteger',
+        'bigInt'        => 'bigInteger',
+        'string'        => 'varchar',
+        'bool'          => 'boolean',
+        'datetime'      => 'dateTime',
+    ];
+
+    private $foreignKeyLookup = true;
 
     /**
      * ColumnParser constructor.
      *
      * @param string $name
      * @param string $definition
+     * @param bool   $foreignKeyLookup
      *
+     * @throws UnknwonDataTypeException
      * @throws WrongAttributeException
      */
-    public function __construct(string $name, string $definition)
+    public function __construct(string $name, string $definition, bool $foreignKeyLookup = true)
     {
-        $this->column      = new Column($name);
-        $this->definitions = Collection::explode($definition, '|');
+        $this->column           = new Column($name);
+        $this->definitions      = Collection::explode($definition, '|');
+        $this->foreignKeyLookup = $foreignKeyLookup;
 
         $this->parseDataType();
         $this->parseAttributes();
         $this->parseProperties();
         $this->parseIndexes();
+        $this->parseForeignKeyAttributes();
     }
 
     /**
@@ -71,6 +114,20 @@ class ColumnParser
     public function getColumn(): Column
     {
         return $this->column;
+    }
+
+    /**
+     * @param string $dataType
+     *
+     * @return string
+     */
+    private function normalizeDataType(string $dataType): string
+    {
+        if (isset($this->dataTypeAliases[ $dataType ])) {
+            return $this->dataTypeAliases[ $dataType ];
+        }
+
+        return $dataType;
     }
 
     /**
@@ -116,18 +173,18 @@ class ColumnParser
 
     private function parseDataType(): void
     {
-        $dataTypes = array_keys($this->dataTypes);
-        $this->definitions->each(function (string $item) use ($dataTypes) {
-            $item = strtolower($item);
-            if (in_array($item, $dataTypes)) {
-                $this->column->dataType    = $item;
-                $this->column->phpDataType = $this->dataTypes[ $item ];
+        $dataTypeDefinition = $this->normalizeDataType($this->definitions->get(0));
+        if ($dataTypeDefinition === self::INDEX_FOREIGN_KEY) {
+            $this->setForeignKeyDefinition();
 
-                return false;
-            }
+            return;
+        }
 
-            return true;
-        });
+        if (!isset($this->dataTypes[ $dataTypeDefinition ])) {
+            throw new UnknwonDataTypeException(sprintf('Unknown data type "%s"', $this->definitions->get(0)));
+        }
+        $this->column->dataType    = $dataTypeDefinition;
+        $this->column->phpDataType = $this->dataTypes[ $this->column->dataType ];
     }
 
     private function parseProperties(): void
@@ -173,6 +230,36 @@ class ColumnParser
     }
 
     /**
+     * @throws \Exception
+     */
+    private function parseForeignKeyAttributes(): void
+    {
+        $this->definitions->each(function (string $item) {
+            if (strpos($item, ':')) {
+                [$attribute, $value] = explode(':', $item);
+
+                if (!in_array($attribute, [self::FOREIGN_KEY_ON_UPDATE, self::FOREIGN_KEY_ON_DELETE])) {
+                    return true;
+                }
+
+                if (!in_array($value, [self::FOREIGN_KEY_CASCADE, self::FOREIGN_KEY_RESTRICT])) {
+                    throw new \Exception(sprintf('Unknown value "%s"', $value));
+                }
+
+                switch ($attribute) {
+                    case self::FOREIGN_KEY_ON_UPDATE:
+                        $this->column->foreignKeyOnUpdate = $value;
+                        break;
+
+                    case self::FOREIGN_KEY_ON_DELETE:
+                        $this->column->foreignKeyOnDelete = $value;
+                        break;
+                }
+            }
+        });
+    }
+
+    /**
      * @param string $type
      * @param mixed  $value
      *
@@ -208,11 +295,22 @@ class ColumnParser
         $parts = Collection::explode($columnName, '_');
 
         if ($parts->last() !== 'id') {
-            throw new \Exception('A foreign key ends with _id: ' . $columnName);
+            throw new \Exception('A foreign key must end with _id: ' . $columnName);
         }
 
         $parts->pop();
 
         return $parts->camel(true);
+    }
+
+    public function setForeignKeyDefinition(): void
+    {
+        if ($this->foreignKeyLookup) {
+            $modelDefinition           = ModelDefinition::fromConfig($this->getModelNameFromForeignKey($this->column->name));
+            $pkColumn                  = $modelDefinition->getColumn('id');
+            $this->column->dataType    = $pkColumn->dataType;
+            $this->column->phpDataType = $pkColumn->phpDataType;
+            $this->column->unsigned    = $pkColumn->unsigned;
+        }
     }
 }

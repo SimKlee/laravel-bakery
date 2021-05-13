@@ -4,6 +4,7 @@ namespace SimKlee\LaravelBakery\Tests\Unit\Models;
 
 use PHPUnit\Framework\TestCase;
 use SimKlee\LaravelBakery\Models\ColumnParser;
+use SimKlee\LaravelBakery\Models\Exceptions\UnknwonDataTypeException;
 use SimKlee\LaravelBakery\Models\Exceptions\WrongAttributeException;
 
 /**
@@ -73,6 +74,30 @@ class ColumnParserTest extends TestCase
                     'dataType'    => 'integer',
                     'phpDataType' => 'int',
                     'nullable'    => true,
+                ]),
+            ],
+            [
+                'name'               => 'BigIntegerColumn',
+                'definition'         => 'bigInteger',
+                'expectedProperties' => $this->getExpectedValues([
+                    'dataType'    => 'bigInteger',
+                    'phpDataType' => 'int',
+                ]),
+            ],
+            [
+                'name'               => 'MediumIntegerColumn',
+                'definition'         => 'mediumInteger|',
+                'expectedProperties' => $this->getExpectedValues([
+                    'dataType'    => 'mediumInteger',
+                    'phpDataType' => 'int',
+                ]),
+            ],
+            [
+                'name'               => 'SmallIntegerColumn',
+                'definition'         => 'smallInteger|',
+                'expectedProperties' => $this->getExpectedValues([
+                    'dataType'    => 'smallInteger',
+                    'phpDataType' => 'int',
                 ]),
             ],
         ];
@@ -266,4 +291,101 @@ class ColumnParserTest extends TestCase
         $this->assertSame($expectedModelName, $parser->getModelNameFromForeignKey($columnName));
     }
 
+    /**
+     * @return array
+     */
+    public function dataProviderForTestDataTypes(): array
+    {
+        return [
+            ['tinyInteger', 'tinyInteger'],
+            ['tinyinteger', 'tinyInteger'],
+            ['tinyint', 'tinyInteger'],
+            ['tinyInt', 'tinyInteger'],
+            ['smallInteger', 'smallInteger'],
+            ['smallinteger', 'smallInteger'],
+            ['smallint', 'smallInteger'],
+            ['smallInt', 'smallInteger'],
+            ['mediumInteger', 'mediumInteger'],
+            ['mediuminteger', 'mediumInteger'],
+            ['mediumint', 'mediumInteger'],
+            ['mediumInt', 'mediumInteger'],
+            ['integer', 'integer'],
+            ['int', 'integer'],
+            ['bigInteger', 'bigInteger'],
+            ['biginteger', 'bigInteger'],
+            ['bigint', 'bigInteger'],
+            ['bigInt', 'bigInteger'],
+            ['varchar', 'varchar'],
+            ['string', 'varchar'],
+            ['char', 'char'],
+            ['text', 'text'],
+            ['decimal', 'decimal'],
+            ['float', 'float'],
+            ['boolean', 'boolean'],
+            ['bool', 'boolean'],
+            ['date', 'date'],
+            ['dateTime', 'dateTime'],
+            ['datetime', 'dateTime'],
+            ['time', 'time'],
+            ['timestamp', 'timestamp'],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderForTestDataTypes
+     *
+     * @param string $type
+     * @param string $expectedType
+     */
+    public function testDataTypesWithAliases(string $type, string $expectedType): void
+    {
+        $parser = new ColumnParser('name', $type);
+        $this->assertSame($expectedType, $parser->getColumn()->dataType);
+    }
+
+    /**
+     *
+     */
+    public function testUnknownDataType()
+    {
+        $this->expectException(UnknwonDataTypeException::class);
+        new ColumnParser('name', 'unknown');
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderForForeignKeyDefinitions(): array
+    {
+        return [
+            [
+                'definition'       => 'fk|onupdate:cascade|ondelete:cascade',
+                'expectedOnUpdate' => ColumnParser::FOREIGN_KEY_CASCADE,
+                'expectedOnDelete' => ColumnParser::FOREIGN_KEY_CASCADE,
+            ],
+            [
+                'definition'       => 'fk|onupdate:restrict|ondelete:restrict',
+                'expectedOnUpdate' => ColumnParser::FOREIGN_KEY_RESTRICT,
+                'expectedOnDelete' => ColumnParser::FOREIGN_KEY_RESTRICT,
+            ],
+            [
+                'definition'       => 'fk|onupdate:cascade|ondelete:restrict',
+                'expectedOnUpdate' => ColumnParser::FOREIGN_KEY_CASCADE,
+                'expectedOnDelete' => ColumnParser::FOREIGN_KEY_RESTRICT,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderForForeignKeyDefinitions
+     *
+     * @param string $definition
+     */
+    public function testForeignKeyDefinitions(string $definition, string $expectedOnUpdate, string $expectedOnDelete): void
+    {
+        $parser = new ColumnParser('name', $definition, false);
+        $column = $parser->getColumn();
+        $this->assertSame($expectedOnUpdate, $column->foreignKeyOnUpdate);
+        $this->assertSame($expectedOnDelete, $column->foreignKeyOnDelete);
+    }
 }

@@ -50,6 +50,18 @@ class ModelDefinition
     }
 
     /**
+     * @param string $model
+     *
+     * @return ModelDefinition
+     */
+    public static function fromConfig(string $model): ModelDefinition
+    {
+        $config = config('models.' . $model);
+
+        return new self($model, $config['table'] ?? null, $config['timestamps'] ?? false);
+    }
+
+    /**
      * @param array $definitions
      */
     public function addColumnDefinitions(array $definitions): void
@@ -123,7 +135,7 @@ class ModelDefinition
     public function usesCarbon(): bool
     {
         return $this->columnBag->filter(function (Column $column) {
-            return $column->phpDataType === 'Carbon';
-        })->count() > 0;
+                return $column->phpDataType === 'Carbon';
+            })->count() > 0;
     }
 }

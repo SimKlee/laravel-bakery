@@ -11,6 +11,7 @@ use SimKlee\LaravelBakery\Models\Column;
 use SimKlee\LaravelBakery\Models\ModelDefinition;
 use SimKlee\LaravelBakery\Models\ModelDefinitionsBag;
 use SimKlee\LaravelBakery\Providers\LaravelBakeryServiceProvider;
+use SimKlee\LaravelBakery\Stub\MigrationWriter;
 use SimKlee\LaravelBakery\Stub\ModelWriter;
 use SimKlee\LaravelBakery\Stub\Stub;
 use Str;
@@ -259,40 +260,34 @@ class BakeModelCommand extends Command
     }
 
     /**
-     * @param string $model
+     * @param string      $model
+     * @param string|null $timestamp
+     *
+     * @return bool
+     * @throws FileNotFoundException
      */
-    private function writeMigrationFile(string $model): bool
+    private function writeMigrationFile(string $model, string $timestamp = null): bool
     {
-        $file = base_path(sprintf(
-            'database/migrations/%s_create_%s_table.php',
-            Carbon::now()->format('Y_m_d_His'),
-            Str::plural(Str::snake($model))
-        ));
+        if (is_null($timestamp)) {
+            $timestamp = Carbon::now()->format('Y_m_d_His');
+        }
 
-        $columns = $this->modelDefinitionsBag
-            ->getModelDefinition($model)
-            ->getColumns()
-            ->map(function (Column $column) {
-                $mig = '$table->';
-                switch ($column->dataType) {
-                    case 'integer':
-                        $mig .= 'integer';
-                        break;
-                }
-                $mig .= '(';
-                $mig .= ')';
-                $mig .= ';';
+        $file = base_path(
+            sprintf('database/migrations/%s_create_%s_table.php', $timestamp, Str::plural(Str::snake($model)))
+        );
 
-                return $mig;
-            })->implode(PHP_EOL);
+        /**
+         * @todo
+         *
+         * check if migration exists
+         * - parse through all migration files get T_CLASS bei get_all_tokens() and check class name
+         *
+         * - rollback specific migration via migrate:rollback --path=migration_file.php
+         *      OR
+         * - delete old migration and show hint: run artisan:migration:fresh
+         */
 
-        $stub = new Stub('migration.stub');
-        $stub->replace('model', $model)
-             ->replace('models', Str::plural($model))
-             ->replace('columns', $columns)
-             ->replace('indexes', '')
-             ->replace('foreignKeys', '');
-
-        return $stub->write($file, false) !== false;
+        return MigrationWriter::fromModelDefinition($this->modelDefinitionsBag->getModelDefinition($model))
+                              ->write($file, true) !== false;
     }
 }

@@ -2,14 +2,17 @@
 
 namespace SimKlee\LaravelBakery\Models;
 
-use Str;
-
 /**
  * Class Column
  * @package SimKlees\LaravelBakery\Models
  */
 class Column
 {
+    /**
+     * @var string
+     */
+    public $model;
+
     /**
      * @var string
      */
@@ -39,6 +42,21 @@ class Column
      * @var bool
      */
     public $foreignKey = false;
+
+    /**
+     * @var Column|null
+     */
+    public $foreignKeyColumn = null;
+
+    /**
+     * @var string|null
+     */
+    public $foreignKeyOnUpdate = null;
+
+    /**
+     * @var string|null
+     */
+    public $foreignKeyOnDelete = null;
 
     /**
      * @var bool
@@ -83,5 +101,14 @@ class Column
     public function __construct(string $name = null)
     {
         $this->name = $name;
+        // @TODO: model name
+    }
+
+    /**
+     * @return string
+     */
+    public function getPropertyString(): string
+    {
+        return sprintf('%s::PROPERTY_PRODUCT_%s', $this->model, strtoupper($column));
     }
 }
