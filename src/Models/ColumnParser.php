@@ -83,7 +83,10 @@ class ColumnParser
         'datetime'      => 'dateTime',
     ];
 
-    private $foreignKeyLookup = true;
+    /**
+     * @var bool
+     */
+    private $foreignKeyLookup;
 
     /**
      * ColumnParser constructor.
@@ -278,7 +281,13 @@ class ColumnParser
                 break;
 
             case 'bool':
-                $value = (bool) $value;
+                if (strtolower($value) === 'true') {
+                    $value = true;
+                } elseif (strtolower($value) === 'false') {
+                    $value = false;
+                } else {
+                    $value = (bool) $value;
+                }
                 break;
 
             default:
