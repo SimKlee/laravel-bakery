@@ -95,7 +95,7 @@ class ColumnParser
      * @throws UnknwonDataTypeException
      * @throws WrongAttributeException
      */
-    public function __construct(string $name, string $definition, bool $foreignKeyLookup = true)
+    public function __construct(string $name, string $definition, bool $foreignKeyLookup = false)
     {
         $this->column           = new Column($name);
         $this->definitions      = Collection::explode($definition, '|');
@@ -308,9 +308,11 @@ class ColumnParser
         if ($this->foreignKeyLookup) {
             $modelDefinition           = ModelDefinition::fromConfig($this->getModelNameFromForeignKey($this->column->name));
             $pkColumn                  = $modelDefinition->getColumn('id');
-            $this->column->dataType    = $pkColumn->dataType;
-            $this->column->phpDataType = $pkColumn->phpDataType;
-            $this->column->unsigned    = $pkColumn->unsigned;
+            if ($pkColumn) {
+                $this->column->dataType    = $pkColumn->dataType;
+                $this->column->phpDataType = $pkColumn->phpDataType;
+                $this->column->unsigned    = $pkColumn->unsigned;
+            }
         }
     }
 }
