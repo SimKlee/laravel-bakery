@@ -40,8 +40,10 @@ class ColumnHelper
         $type = null;
         if ($column->index) {
             $type = 'index';
-        } else if ($column->unique) {
-            $type = 'unique';
+        } else {
+            if ($column->unique) {
+                $type = 'unique';
+            }
         }
 
         if ($type) {
@@ -82,10 +84,15 @@ class ColumnHelper
     private function getMethod(Column $column): string
     {
         $map = [
-            'integer' => 'integer',
-            'varchar' => 'string',
-            'char'    => 'char',
-            'text'    => 'text',
+            'tinyinteger'   => 'tinyInteger',
+            'integer'       => 'integer',
+            'smallinteger'  => 'smallInteger',
+            'mediuminteger' => 'mediumInteger',
+            'biginteger'    => 'bigInteger',
+            'varchar'       => 'string',
+            'char'          => 'char',
+            'text'          => 'text',
+            'timestamp'     => 'timestamp',
         ];
 
         if (!isset($map[ $column->dataType ])) {
