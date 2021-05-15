@@ -1,0 +1,30 @@
+@extends('{{ layout }}')
+
+@section('{{ section }}')
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                {{ Models }}
+                <a href="{{ route('{{ model }}.create') }}" class="btn btn-primary btn-sm float-right">New {{ Model }}</a>
+            </h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+{{ columnHeaders }}
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach($results as $result)
+                    <tr>
+{{ columnRows }}
+                    </tr>
+                @endforeach
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@endsection

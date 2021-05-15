@@ -3,6 +3,7 @@
 namespace SimKlee\LaravelBakery\Database\Migration;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use SimKlee\LaravelBakery\Models\Column;
 
 /**
@@ -20,7 +21,7 @@ class ColumnHelper
     public function getColumnMigration(Column $column): string
     {
         $string = "\t\t\t";
-        $string .= '$this->';
+        $string .= '$table->';
         $string .= $this->getMethod($column);
         $string .= sprintf('(%s)', $this->getMethodParams($column));
         $string .= $this->getAttributeMethods($column);
@@ -38,16 +39,15 @@ class ColumnHelper
     public function getColumnIndexes(Column $column)
     {
         $type = null;
+
         if ($column->index) {
             $type = 'index';
-        } else {
-            if ($column->unique) {
-                $type = 'unique';
-            }
+        } else if ($column->unique) {
+            $type = 'unique';
         }
 
         if ($type) {
-            return sprintf("\t\t\t\$this->%s(['%s'], '%s');", $type, $column->name, $column->name);
+            return sprintf("\t\t\t\$table->%s([%s], %s);", $type, $column->getPropertyString(), $column->getPropertyString());
         }
 
         return false;
@@ -60,17 +60,13 @@ class ColumnHelper
         }
 
         // @TODO: foreign key name: fk__product_has_insurances__product_id (fk__table__column)
-        $foreignKeyName = null;
+        $foreignKeyName = sprintf('fk__%s__%s', Str::plural(Str::snake($column->foreignKeyColumn->model)), $column->name);
 
-        $foreignKey = sprintf("\t\t\t\$this->foreign(%s, '%s')", $column->getPropertyString(), $foreignKeyName);
-        $foreignKey .= sprintf("\t\t\t\t->on(%s)", $column->foreignKeyColumn->model);
-        $foreignKey .= sprintf("\t\t\t\t->references(%s);", $column->foreignKeyColumn->getPropertyString());
+        $foreignKey = sprintf("\t\t\t\$table->foreign(%s, '%s')\n", $column->getPropertyString(), $foreignKeyName);
 
-        /*
-        $table->foreign(ProductHasInsurance::PROPERTY_PRODUCT_ID, '')
-              ->on(\App\Models\Product::TABLE)
-              ->references(\App\Models\Product::PROPERTY_ID);
-        */
+        // @TODO: simplify FQN and add model to use
+        $foreignKey .= sprintf("\t\t\t\t->on(\App\Models\%s::TABLE)\n", $column->foreignKeyColumn->model);
+        $foreignKey .= sprintf("\t\t\t\t->references(\App\Models\%s);", $column->foreignKeyColumn->getPropertyString());
 
         return $foreignKey;
     }
@@ -84,16 +80,16 @@ class ColumnHelper
     private function getMethod(Column $column): string
     {
         $map = [
-            'tinyinteger'   => 'tinyInteger',
+            'tinyInteger'   => 'tinyInteger',
             'integer'       => 'integer',
-            'smallinteger'  => 'smallInteger',
-            'mediuminteger' => 'mediumInteger',
-            'biginteger'    => 'bigInteger',
+            'smallInteger'  => 'smallInteger',
+            'mediumInteger' => 'mediumInteger',
+            'bigInteger'    => 'bigInteger',
             'varchar'       => 'string',
             'char'          => 'char',
             'text'          => 'text',
             'timestamp'     => 'timestamp',
-            'bool'          => 'boolean',
+            'boolean'       => 'boolean',
         ];
 
         if (!isset($map[ $column->dataType ])) {
@@ -112,7 +108,7 @@ class ColumnHelper
      */
     private function getMethodParams(Column $column): string
     {
-        $params = collect([$column->name]);
+        $params = collect([$column->getPropertyString()]);
 
         if ($column->autoIncrement) {
             $params->add(true);
@@ -126,7 +122,11 @@ class ColumnHelper
             $params->add($column->precision);
         }
 
-        return $params->map(function ($param) {
+        return $params->map(function ($param, $i) {
+            if ($i === 0) {
+                return $param;
+            }
+
             return $this->cast($param);
         })->implode(', ');
     }

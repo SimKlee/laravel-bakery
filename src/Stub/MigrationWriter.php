@@ -46,7 +46,7 @@ class MigrationWriter extends Stub
              ->replace('models', Str::plural($this->modelDefinition->getModel()))
              ->replace('columns', $this->getColumnDefinitions())
              ->replace('indexes', $this->getColumnIndexes())
-             ->replace('foreignKeys', '');
+             ->replace('foreignKeys', $this->getForeignKeys());
 
         return parent::write($file, $override);
     }
@@ -77,6 +77,23 @@ class MigrationWriter extends Stub
                 $helper = new ColumnHelper();
 
                 return $helper->getColumnIndexes($column);
+            })->implode(PHP_EOL);
+    }
+
+    /**
+     * @return string
+     */
+    private function getForeignKeys(): string
+    {
+        $helper = new ColumnHelper();
+
+        return $this->modelDefinition
+            ->getColumns()
+            ->filter(function (Column $column) {
+                return $column->foreignKey;
+            })
+            ->map(function (Column $column) use ($helper) {
+                return $helper->getColumnForeignKey($column);
             })->implode(PHP_EOL);
     }
 

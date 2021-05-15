@@ -35,7 +35,10 @@ class ModelDefinitionsBag
         foreach ($config as $modelName => $settings) {
             $modelDefinition = new ModelDefinition($modelName, $settings['table'] ?? null, $settings['timestamps'] ?? false);
             collect($settings['columns'])->each(function ($definition, $columnName) use ($modelDefinition) {
-                $modelDefinition->addColumn(ColumnParser::parse($columnName, $definition));
+                // @TODO: find a better way to set the model in the column
+                $column        = ColumnParser::parse($columnName, $definition);
+                $column->model = $modelDefinition->getModel();
+                $modelDefinition->addColumn($column);
             });
             $bag->addModelDefinition($modelDefinition);
         }
@@ -94,6 +97,10 @@ class ModelDefinitionsBag
                     $column->length      = $pk->length;
                     $column->precision   = $pk->precision;
                     $column->index       = true;
+
+                    $col = $modelDefinition->getColumn('id');
+
+                    $column->foreignKeyColumn = $modelDefinition->getColumn('id');
                 }
             });
         });

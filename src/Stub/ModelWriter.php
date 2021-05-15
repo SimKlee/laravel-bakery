@@ -80,8 +80,16 @@ class ModelWriter extends Stub
         $this->modelDefinition = $modelDefinition;
 
         if ($this->modelDefinition->hasTimestamps()) {
-            $this->modelDefinition->addColumn(ColumnParser::parse('created_at', 'timestamp'));
-            $this->modelDefinition->addColumn(ColumnParser::parse('updated_at', 'timestamp'));
+
+            // @TODO: find a better solution to add the model information to the column
+            $createdAt = ColumnParser::parse('created_at', 'timestamp');
+            $createdAt->model = $this->modelDefinition->getModel();
+            $this->modelDefinition->addColumn($createdAt);
+
+            // @TODO: find a better solution to add the model information to the column
+            $updatedAt = ColumnParser::parse('updated_at', 'timestamp');
+            $updatedAt->model = $this->modelDefinition->getModel();
+            $this->modelDefinition->addColumn($updatedAt);
         }
 
         if ($this->modelDefinition->usesCarbon()) {

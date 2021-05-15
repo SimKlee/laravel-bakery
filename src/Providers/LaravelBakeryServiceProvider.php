@@ -5,6 +5,7 @@ namespace SimKlee\LaravelBakery\Providers;
 use File;
 use Illuminate\Support\ServiceProvider;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelCommand;
+use SimKlee\LaravelBakery\Console\Commands\BakeModelCRUDCommand;
 
 class LaravelBakeryServiceProvider extends ServiceProvider
 {
@@ -15,6 +16,7 @@ class LaravelBakeryServiceProvider extends ServiceProvider
             // commands
             $this->commands([
                 BakeModelCommand::class,
+                BakeModelCRUDCommand::class,
             ]);
 
             // config files

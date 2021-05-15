@@ -2,13 +2,42 @@
 
 namespace App\Models\Repositories;
 
-use App\Models\{{ model }};
+use DB;
+use Illuminate\Support\Collection;
+use App\Models\{{ Model }};
 
 /**
- * Class {{ model }}Repository
+ * Class {{ Model }}Repository
  * @package App\Models\Repositories
  */
-class {{ model }}Repository extends AbstractRepository
+class {{ Model }}Repository extends AbstractRepository
 {
+    /**
+     * @param array|string[] $columns
+     *
+     * @return Collection|{{ Model }}[]
+     */
+    public function all(array $columns = ['*']): Collection
+    {
+        return {{ Model }}::all();
+    }
 
+    /**
+     * @return Collection
+     */
+    public function lookup(): Collection
+    {
+        /*
+        // @TODO
+        return DB::table({{ Model }}::TABLE)
+            ->select([
+                {{ Model }}::column({{ Model }}::PROPERTY_ID, 'value'),
+                {{ Model }}::column({{ Model }}::PROPERTY_NAME, 'label'),
+            ])
+            ->orderBy({{ Model }}::column({{ Model }}::PROPERTY_NAME))
+            ->get();
+         */
+
+        return collect();
+    }
 }

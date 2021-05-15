@@ -3,11 +3,9 @@
 namespace SimKlee\LaravelBakery\Console\Commands;
 
 use File;
-use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
 use SimKlee\LaravelBakery\File\ConsoleFileHelper;
-use SimKlee\LaravelBakery\Models\Column;
 use SimKlee\LaravelBakery\Models\ModelDefinition;
 use SimKlee\LaravelBakery\Models\ModelDefinitionsBag;
 use SimKlee\LaravelBakery\Providers\LaravelBakeryServiceProvider;
@@ -20,7 +18,7 @@ use Str;
  * Class InstallBlogPackage
  * @package SimKlee\LaravelBakery\Console\Commands
  */
-class BakeModelCommand extends Command
+class BakeModelCommand extends AbstractBakeCommand
 {
     private const ARGUMENT_MODEL  = 'model';
     private const OPTION_ABSTRACT = 'abstract';
@@ -35,41 +33,13 @@ class BakeModelCommand extends Command
                                        {--abstract : Copies a abstract model to your app models folder}
                                        {--all : Generate all models in config file}
                                        {--config= : Define the config file name (without file extension .php)}
-                                       {--sample : Create a sample config file}';
+                                       {--sample : Create a sample config file}
+                                       {--force}';
 
     /**
      * @var string
      */
     protected $description = 'Bake a new model from a config file.';
-
-    /**
-     * @var ConsoleFileHelper
-     */
-    private $fileHelper;
-
-    /**
-     * @var string
-     */
-    private $configFile = 'models.php';
-
-    /**
-     * @var array
-     */
-    private $configuration;
-
-    /**
-     * @var ModelDefinitionsBag
-     */
-    private $modelDefinitionsBag;
-
-    /**
-     * BakeModelCommand constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->fileHelper = new ConsoleFileHelper($this);
-    }
 
     /**
      * @return int
@@ -119,53 +89,26 @@ class BakeModelCommand extends Command
         }
 
         if (!$model) {
-
             $model = $this->askForModel();
-
-            $modelDefinition = new ModelDefinition($model, $this->configuration[ $model ]['table'], $this->configuration[ $model ]['timestamps']);
-            $modelDefinition->addColumnDefinitions($this->configuration[ $model ]['columns']);
-
-            if ($this->writeModelClass($model)) {
-                $this->info(sprintf('Written model "%s" successfully.', $model));
-            }
-
-            if ($this->writeModelRepositoryClass($model)) {
-                $this->info(sprintf('Written model repository for "%s" successfully.', $model));
-            }
-
-            if ($this->writeMigrationFile($model)) {
-                $this->info(sprintf('Written migration for "%s" successfully.', $model));
-            }
         }
 
+        $modelDefinition = new ModelDefinition($model, $this->configuration[ $model ]['table'], $this->configuration[ $model ]['timestamps']);
+        $modelDefinition->addColumnDefinitions($this->configuration[ $model ]['columns']);
+
+        if ($this->writeModelClass($model)) {
+            $this->info(sprintf('Written model "%s" successfully.', $model));
+        }
+
+        if ($this->writeModelRepositoryClass($model)) {
+            $this->info(sprintf('Written model repository for "%s" successfully.', $model));
+        }
+
+        if ($this->writeMigrationFile($model)) {
+            $this->info(sprintf('Written migration for "%s" successfully.', $model));
+        }
+
+
         return 0;
-    }
-
-    private function getModels(): array
-    {
-        return collect(array_keys($this->configuration))->map(function (string $model, int $i) {
-            return [$i, $model];
-        })->toArray();
-    }
-
-    private function showModels(array $models = null): void
-    {
-        $this->info('List of defined models:');
-        $this->table(['#', 'Model'], $this->getModels());
-    }
-
-    private function askForModel(): string
-    {
-        $this->showModels();
-        $models = array_keys($this->configuration);
-        $i      = (int) $this->ask('Choose a model');
-
-        return $models[ $i ];
-    }
-
-    private function loadConfiguration(): void
-    {
-        $this->configuration = config(substr($this->configFile, 0, -4));
     }
 
     /**
@@ -200,7 +143,7 @@ class BakeModelCommand extends Command
     {
         $file     = app_path(sprintf('Models/%s.php', $model));
         $override = true;
-        if (File::exists($file)) {
+        if (!$this->option('force') && File::exists($file)) {
             $override = $this->choice(
                     sprintf('Model "%s" already exists. Overwrite?', $model),
                     ['y' => 'yes', 'n' => 'no'],
@@ -239,7 +182,7 @@ class BakeModelCommand extends Command
 
         $file     = sprintf('%s/%sRepository.php', $path, $model);
         $override = true;
-        if (File::exists($file)) {
+        if (!$this->option('force') && File::exists($file)) {
             $override = $this->choice(
                     sprintf('Model repository for "%s" already exists. Overwrite?', $model),
                     ['y' => 'yes', 'n' => 'no'],

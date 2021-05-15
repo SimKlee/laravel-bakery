@@ -109,6 +109,6 @@ class Column
      */
     public function getPropertyString(): string
     {
-        return sprintf('%s::PROPERTY_PRODUCT_%s', $this->model, strtoupper($column));
+        return sprintf('%s::PROPERTY_%s', $this->model, strtoupper($this->name));
     }
 }

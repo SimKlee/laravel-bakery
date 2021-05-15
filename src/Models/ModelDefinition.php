@@ -56,9 +56,11 @@ class ModelDefinition
      */
     public static function fromConfig(string $model): ModelDefinition
     {
-        $config = config('models.' . $model);
+        $config   = config('models.' . $model);
+        $instance = new self($model, $config['table'] ?? null, $config['timestamps'] ?? false);
+        $instance->addColumnDefinitions($config['columns']);
 
-        return new self($model, $config['table'] ?? null, $config['timestamps'] ?? false);
+        return $instance;
     }
 
     /**
@@ -67,7 +69,8 @@ class ModelDefinition
     public function addColumnDefinitions(array $definitions): void
     {
         collect($definitions)->each(function (string $columnDefinition, string $name) {
-            $this->addColumn(ColumnParser::parse($name, $columnDefinition));
+            $column = ColumnParser::parse($name, $columnDefinition);
+            $this->addColumn($column);
         });
     }
 
@@ -106,10 +109,16 @@ class ModelDefinition
     }
 
     /**
+     * @param bool $snake
+     *
      * @return string
      */
-    public function getModel(): string
+    public function getModel(bool $snake = false): string
     {
+        if ($snake) {
+            return Str::snake($this->model);
+        }
+
         return $this->model;
     }
 

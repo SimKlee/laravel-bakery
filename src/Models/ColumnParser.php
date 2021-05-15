@@ -108,7 +108,9 @@ class ColumnParser
         $this->parseAttributes();
         $this->parseProperties();
         $this->parseIndexes();
-        $this->parseForeignKeyAttributes();
+        if ($this->column->foreignKey) {
+            $this->parseForeignKeyAttributes();
+        }
     }
 
     /**
@@ -280,14 +282,8 @@ class ColumnParser
                 $value = (string) $value;
                 break;
 
-            case 'bool':
-                if (strtolower($value) === 'true') {
-                    $value = true;
-                } elseif (strtolower($value) === 'false') {
-                    $value = false;
-                } else {
-                    $value = (bool) $value;
-                }
+            case 'boolean':
+                $value = $this->castBoolean($value);
                 break;
 
             default:
@@ -295,6 +291,24 @@ class ColumnParser
         }
 
         return $value;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    private function castBoolean($value): bool
+    {
+        if (strtolower($value) === 'true') {
+            return true;
+        }
+
+        if (strtolower($value) === 'false') {
+            return false;
+        }
+
+        return (bool) $value;
     }
 
     /**

@@ -1,0 +1,75 @@
+<?php declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
+use App\Models\{{ Model }};
+{{ usedModels }}
+use App\Models\Repositories\AbstractRepository;
+use App\Models\Repositories\{{ Model }}Repository;
+{{ usedRepositories }}
+
+/**
+ * Class {{ Model }}Controller
+ * @package App\Http\Controllers
+ */
+class {{ Model }}Controller extends Controller
+{
+    /**
+     * @var AbstractRepository|{{ Model }}Repository
+     */
+    private $repository;
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+
+        $this->repository = AbstractRepository::create({{ Model }}::class);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return View
+     */
+    public function index(Request $request): View
+    {
+        $results = $this->repository->all();
+
+        return view('{{ model }}.index')
+            ->with('results', $results);
+    }
+
+    public function store()
+    {
+        return view('home');
+    }
+
+    public function create()
+    {
+{{ createRepositories }}
+
+        return view('{{ model }}.edit'){{ createWith }};
+    }
+
+    public function show()
+    {
+        return view('home');
+    }
+
+    public function update()
+    {
+        return view('home');
+    }
+
+    public function destroy()
+    {
+        return view('home');
+    }
+
+    public function edit()
+    {
+        return view('home');
+    }
+}
