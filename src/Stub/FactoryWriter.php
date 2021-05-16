@@ -4,15 +4,15 @@ namespace SimKlee\LaravelBakery\Stub;
 
 use Illuminate\Support\Collection;
 use SimKlee\LaravelBakery\Models\Column;
-use SimKlee\LaravelBakery\Models\ColumnValidation;
 use SimKlee\LaravelBakery\Models\ModelDefinition;
 use Str;
+use function PHPUnit\TestFixture\func;
 
 /**
- * Class ModelStoreRequestWriter
+ * Class FactoryWriter
  * @package SimKlee\LaravelBakery\Support
  */
-class ModelStoreRequestWriter extends Stub
+class FactoryWriter extends Stub
 {
     /**
      * @var ModelDefinition
@@ -23,11 +23,11 @@ class ModelStoreRequestWriter extends Stub
      *
      * @param ModelDefinition $modelDefinition
      *
-     * @return ModelStoreRequestWriter
+     * @return FactoryWriter
      */
-    public static function fromModelDefinition(ModelDefinition $modelDefinition): ModelStoreRequestWriter
+    public static function fromModelDefinition(ModelDefinition $modelDefinition): FactoryWriter
     {
-        $writer = new ModelStoreRequestWriter('mode_store_request.stub',);
+        $writer = new FactoryWriter('factory.stub',);
         $writer->setModelDefinition($modelDefinition);
 
         return $writer;
@@ -50,17 +50,24 @@ class ModelStoreRequestWriter extends Stub
     public function write(string $file, bool $override = false)
     {
         $this->replace('Model', $this->modelDefinition->getModel())
-             ->replace('rules', $this->getValidationRules());
+             ->replace('definitions', $this->getDefinitions());
 
         return parent::write($file, $override);
     }
 
-    private function getValidationRules(): string
+    private function getDefinitions(): string
     {
         return $this->modelDefinition
             ->getColumns()
+            ->filter(function (Column $column) {
+                return $column->primaryKey === false;
+            })
             ->map(function (Column $column) {
-                return (new ColumnValidation($column))->getRule();
+                return sprintf(
+                    '%s%s => null,',
+                    "\t\t\t",
+                    $column->getPropertyString()
+                );
             })
             ->implode(PHP_EOL);
     }

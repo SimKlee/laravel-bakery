@@ -9,6 +9,7 @@ use SimKlee\LaravelBakery\File\ConsoleFileHelper;
 use SimKlee\LaravelBakery\Models\ModelDefinition;
 use SimKlee\LaravelBakery\Models\ModelDefinitionsBag;
 use SimKlee\LaravelBakery\Providers\LaravelBakeryServiceProvider;
+use SimKlee\LaravelBakery\Stub\FactoryWriter;
 use SimKlee\LaravelBakery\Stub\MigrationWriter;
 use SimKlee\LaravelBakery\Stub\ModelWriter;
 use SimKlee\LaravelBakery\Stub\Stub;
@@ -107,8 +108,33 @@ class BakeModelCommand extends AbstractBakeCommand
             $this->info(sprintf('Written migration for "%s" successfully.', $model));
         }
 
+        if ($this->writeModelFactory($model)) {
+            $this->info(sprintf('Written factory for "%s" successfully.', $model));
+        }
 
         return 0;
+    }
+
+    private function writeModelFactory(string $model): bool
+    {
+        $file     = database_path(sprintf('factories/%sFactory.php', $model));
+        $override = true;
+        if (!$this->option('force') && File::exists($file)) {
+            $override = $this->choice(
+                    sprintf('Factory "%s" already exists. Overwrite?', $model),
+                    ['y' => 'yes', 'n' => 'no'],
+                    'no'
+                ) === 'y';
+        }
+
+        if (!$override) {
+            $this->warn(sprintf('Writing factory "%s" skipped.', $model));
+
+            return false;
+        }
+
+        return FactoryWriter::fromModelDefinition($this->modelDefinitionsBag->getModelDefinition($model))
+                            ->write($file, $override) !== false;
     }
 
     /**

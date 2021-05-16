@@ -6,7 +6,11 @@
         <div class="card-header">
             <h2>
                 {{ Models }}
-                <a href="{{ route('{{ model }}.create') }}" class="btn btn-primary btn-sm float-right">New {{ Model }}</a>
+                <div class="float-right">
+                    <a href="{{ route('{{ model }}.create') }}" class="btn btn-primary">New {{ Model }}</a>
+                    <a href="{{ route('model.create.random', ['model'=> '{{ Model }}']) }}" class="btn btn-dark">Create Random {{ Model }}</a>
+                </div>
+
             </h2>
         </div>
         <div class="card-body">

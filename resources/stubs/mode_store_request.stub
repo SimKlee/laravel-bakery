@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\{{ Model }};
+
 /**
  * Class {{ Model }}StoreRequest
  * @package App\Http\Requests
@@ -14,7 +16,7 @@ class {{ Model }}StoreRequest extends AbstractModelStoreRequest
     public function rules(): array
     {
         return [
-
+{{ rules }}
         ];
     }
 }

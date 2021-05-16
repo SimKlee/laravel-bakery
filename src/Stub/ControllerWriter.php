@@ -64,7 +64,8 @@ class ControllerWriter extends Stub
              ->replace('createRepositories', $this->getCreateRepositories())
              ->replace('createWith', $this->getCreateWith())
              ->replace('usedModels', $this->getUsedModels())
-             ->replace('usedRepositories', $this->getUsedRepositories());
+             ->replace('usedRepositories', $this->getUsedRepositories())
+             ->replace('rules', $this->getValidationRules());
 
         return parent::write($file, $override);
     }
@@ -134,5 +135,17 @@ class ControllerWriter extends Stub
                 ),
             ])->implode(PHP_EOL);
         })->implode(PHP_EOL);
+    }
+
+    /**
+     * @return string
+     */
+    private function getValidationRules(): string
+    {
+        return $this->modelDefinition
+            ->getColumns()
+            ->map(function (Column $column) {
+
+            })->implode(PHP_EOL);
     }
 }

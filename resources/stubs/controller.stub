@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use App\Http\Requests\{{ Model }}StoreRequest;
 use App\Models\{{ Model }};
 {{ usedModels }}
 use App\Models\Repositories\AbstractRepository;
@@ -41,9 +42,11 @@ class {{ Model }}Controller extends Controller
             ->with('results', $results);
     }
 
-    public function store()
+    public function store({{ Model }}StoreRequest $request)
     {
-        return view('home');
+        {{ Model }}::create($request->validated());
+
+        return response()->redirectToRoute('{{ model }}.index');
     }
 
     public function create()
