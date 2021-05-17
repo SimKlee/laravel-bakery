@@ -59,6 +59,19 @@ class BakeModelCommand extends AbstractBakeCommand
      */
     public function handle(): int
     {
+        $this->loadConfiguration();
+        $this->modelDefinitionsBag = ModelDefinitionsBag::fromConfig($this->configuration);
+
+        if ($this->option(self::OPTION_ALL)) {
+            $timestamp = Carbon::now();
+            collect(array_keys($this->configuration))->each(function (string $model) use ($timestamp) {
+                $timestamp->addSecond();
+                $this->handleModel($model, $timestamp);
+            });
+
+            return 0;
+        }
+
         if ($this->option(self::OPTION_ABSTRACT)) {
             return $this->handleAbstract();
         }
@@ -77,10 +90,6 @@ class BakeModelCommand extends AbstractBakeCommand
             return $this->createSample();
         }
 
-        $this->loadConfiguration();
-
-        $this->modelDefinitionsBag = ModelDefinitionsBag::fromConfig($this->configuration);
-
         $model = $this->argument(self::ARGUMENT_MODEL);
         if ($model && !isset($this->configuration[ $model ])) {
             $this->error(sprintf('Model "%s" is not defined in config file "%s"!', $model, $this->configFile));
@@ -92,7 +101,24 @@ class BakeModelCommand extends AbstractBakeCommand
         if (!$model) {
             $model = $this->askForModel();
         }
+        $this->handleModel($model);
 
+    }
+
+    /**
+     * @param string      $model
+     * @param Carbon|null $timestamp
+     *
+     * @return int
+     * @throws FileNotFoundException
+     */
+    private function handleModel(string $model, Carbon $timestamp = null): int
+    {
+        if (is_null($timestamp)) {
+            $timestamp = Carbon::now();
+        }
+
+        $this->info('Processing '.$model);
         $modelDefinition = new ModelDefinition($model, $this->configuration[ $model ]['table'], $this->configuration[ $model ]['timestamps']);
         $modelDefinition->addColumnDefinitions($this->configuration[ $model ]['columns']);
 
@@ -104,13 +130,15 @@ class BakeModelCommand extends AbstractBakeCommand
             $this->info(sprintf('Written model repository for "%s" successfully.', $model));
         }
 
-        if ($this->writeMigrationFile($model)) {
+        if ($this->writeMigrationFile($model, $timestamp->format('Y_m_d_His'))) {
             $this->info(sprintf('Written migration for "%s" successfully.', $model));
         }
 
         if ($this->writeModelFactory($model)) {
             $this->info(sprintf('Written factory for "%s" successfully.', $model));
         }
+
+        $this->info('');
 
         return 0;
     }
@@ -223,7 +251,7 @@ class BakeModelCommand extends AbstractBakeCommand
         }
 
         $stub = new Stub('repository.stub');
-        $stub->replace('model', $model);
+        $stub->replace('Model', $model);
 
         return $stub->write($file, $override) !== false;
     }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\WithFaker;
 
 /**
- * Class {{ Model }}
+ * Class {{ Model }}Factory
  * @package Database\Factories
  */
 class {{ Model }}Factory extends Factory

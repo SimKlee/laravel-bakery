@@ -19,7 +19,7 @@ class LookupSelectboxViewComponent extends AbstractColumnViewComponent
             '<x-lookup-selectbox id="%s" label="%s" :lookup="$%sLookup"></x-lookup-selectbox>',
             $this->column->name,
             $this->column->name,
-            Str::snake($this->column->foreignKeyColumn->model)
+            Str::camel($this->column->foreignKeyColumn->model)
         );
     }
 }

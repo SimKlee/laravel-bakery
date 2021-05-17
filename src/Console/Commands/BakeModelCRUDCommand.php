@@ -27,7 +27,8 @@ class BakeModelCRUDCommand extends AbstractBakeCommand
     protected $signature = 'bake:model:crud {model?}
                                        {--all : Generate all models in config file}
                                        {--config= : Define the config file name (without file extension .php)}
-                                       {--force}';
+                                       {--force}
+                                       {--menu}';
 
     /**
      * @var string
@@ -46,9 +47,20 @@ class BakeModelCRUDCommand extends AbstractBakeCommand
     {
         // @TODO: implement ask for overriding or force-Arg
         // @TODO: config-Arg
-        // @TODO: all-Arg
 
         $this->loadConfiguration();
+
+        if ($this->option('menu')) {
+            return $this->createMenu();
+        }
+
+        if ($this->option(self::OPTION_ALL)) {
+            collect(array_keys($this->configuration))->each(function (string $model) {
+                $this->handleModel($model);
+            });
+
+            return 0;
+        }
 
         $model = $this->argument(self::ARGUMENT_MODEL)
             ? (string) $this->argument(self::ARGUMENT_MODEL)
@@ -64,6 +76,7 @@ class BakeModelCRUDCommand extends AbstractBakeCommand
      */
     private function handleModel(string $model): int
     {
+        $this->info('Processing ' . $model);
         $this->modelDefinition = $this->modelDefinitionsBag->getModelDefinition($model);
 
         $this->addResourceRoute($model);
@@ -72,7 +85,23 @@ class BakeModelCRUDCommand extends AbstractBakeCommand
         $this->createIndexView();
         $this->createEditView();
 
+        $this->info('');
+
         return 0;
+    }
+
+    private function createMenu(): int
+    {
+        File::delete(config_path('menu.php'));
+
+        $items = collect(array_keys($this->configuration))->map(function (string $model) {
+            return [
+                'label' => $model,
+                'href'  => '/' . Str::snake($model),
+            ];
+        })->toArray();
+
+        return File::put(config_path('menu.php'), '<?php' . PHP_EOL . 'return ' . var_export($items, true) . ';');
     }
 
     /**
@@ -146,7 +175,7 @@ class BakeModelCRUDCommand extends AbstractBakeCommand
 
         $file  = app_path(sprintf('Http/Requests/%sStoreRequest.php', $this->modelDefinition->getModel()));
         $bytes = ModelStoreRequestWriter::fromModelDefinition($this->modelDefinition)
-                                 ->write($file, true);
+                                        ->write($file, true);
 
         if ($bytes !== false) {
             $this->info(sprintf('Added ModelStoreRequest: %s [%s bytes]', $file, $bytes));

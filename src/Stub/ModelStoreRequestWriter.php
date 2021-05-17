@@ -59,6 +59,9 @@ class ModelStoreRequestWriter extends Stub
     {
         return $this->modelDefinition
             ->getColumns()
+            ->filter(function (Column $column) {
+                return $column->primaryKey === false;
+            })
             ->map(function (Column $column) {
                 return (new ColumnValidation($column))->getRule();
             })

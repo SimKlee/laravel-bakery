@@ -60,7 +60,7 @@ class ColumnHelper
         }
 
         // @TODO: foreign key name: fk__product_has_insurances__product_id (fk__table__column)
-        $foreignKeyName = sprintf('fk__%s__%s', Str::plural(Str::snake($column->foreignKeyColumn->model)), $column->name);
+        $foreignKeyName = sprintf('fk__%s__%s', Str::plural(Str::snake($column->model)), $column->name);
 
         $foreignKey = sprintf("\t\t\t\$table->foreign(%s, '%s')\n", $column->getPropertyString(), $foreignKeyName);
 
@@ -90,6 +90,7 @@ class ColumnHelper
             'text'          => 'text',
             'timestamp'     => 'timestamp',
             'boolean'       => 'boolean',
+            'decimal'       => 'decimal',
         ];
 
         if (!isset($map[ $column->dataType ])) {

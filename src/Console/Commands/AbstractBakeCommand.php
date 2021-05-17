@@ -47,7 +47,10 @@ abstract class AbstractBakeCommand extends Command
     protected function getModels(): array
     {
         return collect(array_keys($this->configuration))->map(function (string $model, int $i) {
-            return [$i, $model];
+            $modelPublished      = (int) class_exists('\\App\\Models\\' . $model);
+            $controllerPublished = (int) class_exists('\\App\\Http\\Controllers\\' . $model . 'Controller');
+
+            return [$i, $model, $modelPublished, $controllerPublished];
         })->toArray();
     }
 
@@ -57,7 +60,7 @@ abstract class AbstractBakeCommand extends Command
     protected function showModels(array $models = null): void
     {
         $this->info('List of defined models:');
-        $this->table(['#', 'Model'], $this->getModels());
+        $this->table(['#', 'Model', 'Published', 'Controller'], $this->getModels());
     }
 
     /**
