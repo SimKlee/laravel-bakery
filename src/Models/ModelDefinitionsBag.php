@@ -34,6 +34,9 @@ class ModelDefinitionsBag
         $bag = new self();
         foreach ($config as $modelName => $settings) {
             $modelDefinition = new ModelDefinition($modelName, $settings['table'] ?? null, $settings['timestamps'] ?? false);
+            if (isset($settings['values'])) {
+                $modelDefinition->setValues($settings['values']);
+            }
             collect($settings['columns'])->each(function ($definition, $columnName) use ($modelDefinition) {
                 // @TODO: find a better way to set the model in the column
                 $column        = ColumnParser::parse($columnName, $definition);

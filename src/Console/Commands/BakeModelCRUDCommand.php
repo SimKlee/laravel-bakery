@@ -11,7 +11,7 @@ use SimKlee\LaravelBakery\Stub\IndexCRUDWriter;
 use SimKlee\LaravelBakery\Stub\ModelStoreRequestWriter;
 
 /**
- * Class InstallBlogPackage
+ * Class BakeModelCommand
  * @package SimKlee\LaravelBakery\Console\Commands
  */
 class BakeModelCRUDCommand extends AbstractBakeCommand

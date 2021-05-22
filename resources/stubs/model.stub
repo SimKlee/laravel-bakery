@@ -3,16 +3,22 @@
 namespace App\Models;
 {{ uses }}
 /**
- * Class {{ model }}
+ * Class {{ Model }}
  * @package App\Models
  *
 {{ properties }}
+ *
+ * @method static {{ Model }} find(mixed $id, array $columns = [])
+ * @method static {{ Model }} create(array $attributes = [])
+ * @method static {{ Model }} firstOrCreate(array $attributes = [], array $values = [])
  */
-class {{ model }} extends {{ extends }}
+class {{ Model }} extends {{ extends }}
 {
     const TABLE = '{{ table }}';
 
 {{ constants }}
+
+{{ valueConstants }}
 
     /**
      * @var string

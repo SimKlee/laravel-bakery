@@ -94,6 +94,11 @@ class Column
     public $unique = false;
 
     /**
+     * @var array
+     */
+    public $values;
+
+    /**
      * Column constructor.
      *
      * @param string|null $name

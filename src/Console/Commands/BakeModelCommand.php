@@ -16,7 +16,7 @@ use SimKlee\LaravelBakery\Stub\Stub;
 use Str;
 
 /**
- * Class InstallBlogPackage
+ * Class BakeModelCommand
  * @package SimKlee\LaravelBakery\Console\Commands
  */
 class BakeModelCommand extends AbstractBakeCommand
@@ -101,8 +101,8 @@ class BakeModelCommand extends AbstractBakeCommand
         if (!$model) {
             $model = $this->askForModel();
         }
-        $this->handleModel($model);
 
+        return $this->handleModel($model);
     }
 
     /**
@@ -118,9 +118,12 @@ class BakeModelCommand extends AbstractBakeCommand
             $timestamp = Carbon::now();
         }
 
-        $this->info('Processing '.$model);
+        $this->info('Processing ' . $model);
         $modelDefinition = new ModelDefinition($model, $this->configuration[ $model ]['table'], $this->configuration[ $model ]['timestamps']);
         $modelDefinition->addColumnDefinitions($this->configuration[ $model ]['columns']);
+        if (isset($this->configuration[ $model ]['values'])) {
+            $modelDefinition->setValues($this->configuration[ $model ]['values']);
+        }
 
         if ($this->writeModelClass($model)) {
             $this->info(sprintf('Written model "%s" successfully.', $model));

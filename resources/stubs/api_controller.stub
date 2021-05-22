@@ -1,0 +1,67 @@
+<?php declare(strict_types=1);
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\{{ Model }};
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
+/**
+ * Class {{ Model }}Controller
+ * @package App\Http\Controllers\Api
+ */
+class {{ Model }}Controller extends Controller
+{
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = {{ Model }}::query()->select({{ Model }}::column('*'));
+
+        return response()->json($query->get());
+    }
+
+    public function store()
+    {
+
+    }
+
+    public function create()
+    {
+
+    }
+
+    /**
+     * @param Request $request
+     * @param int     ${{ model }}
+     *
+     * @return JsonResponse
+     */
+    public function show(Request $request, int ${{ model }}): JsonResponse
+    {
+        $item       = {{ Model }}::find($product);
+        $statusCode = $item ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
+
+        return response()->json($item, $statusCode);
+    }
+
+    public function update()
+    {
+
+    }
+
+    public function destroy()
+    {
+
+    }
+
+    public function edit()
+    {
+
+    }
+}

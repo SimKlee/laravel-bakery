@@ -91,6 +91,7 @@ class ColumnHelper
             'timestamp'     => 'timestamp',
             'boolean'       => 'boolean',
             'decimal'       => 'decimal',
+            'dateTime'       => 'dateTime',
         ];
 
         if (!isset($map[ $column->dataType ])) {

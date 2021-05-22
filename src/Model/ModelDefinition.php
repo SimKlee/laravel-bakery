@@ -1,56 +1,25 @@
 <?php declare(strict_types=1);
 
-namespace SimKlee\LaravelBakery\Models;
+namespace SimKlee\LaravelBakery\Model;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use SimKlee\LaravelBakery\Support\Collection;
+use SimKlee\LaravelBakery\Model\Column\ColumnParser;
 
 /**
  * Class ModelDefinition
- * @package SimKlees\LaravelBakery\Models
+ * @package SimKlee\LaravelBakery\Model
  */
 class ModelDefinition
 {
-    /**
-     * @var string
-     */
-    private $model;
+    public string      $model;
+    public bool        $timestamps = false;
+    public array       $values     = [];
+    public string      $table;
+    private Collection $columnBag;
 
-    /**
-     * @var string
-     */
-    private $table;
-
-    /**
-     * @var bool
-     */
-    private $timestamps = false;
-
-    /**
-     * @var Collection
-     */
-    private $columnBag;
-
-    /**
-     * @var array
-     */
-    private $values = [];
-
-    /**
-     * ModelDefinition constructor.
-     *
-     * @param string      $model
-     * @param string|null $table
-     * @param bool        $timestamps
-     */
-    public function __construct(string $model, string $table = null, bool $timestamps = false)
+    public function __construct()
     {
-        $this->model      = $model;
-        $this->timestamps = $timestamps;
-        $this->table      = (!is_null($table))
-            ? $table
-            : Str::plural(Str::snake($model));
-
         $this->columnBag = new Collection();
     }
 
@@ -61,13 +30,23 @@ class ModelDefinition
      */
     public static function fromConfig(string $model): ModelDefinition
     {
-        $config   = config('models.' . $model);
-        $instance = new self($model, $config['table'] ?? null, $config['timestamps'] ?? false);
-        $instance->addColumnDefinitions($config['columns']);
+        $config          = config('models.' . $model);
+        $instance        = new ModelDefinition();
+        $instance->model = $model;
+
+        $instance->timestamps = isset($config['timestamps'])
+            ? $config['timestamps']
+            : false;
+
+        $instance->table = isset($config['table'])
+            ? $config['table']
+            : Str::plural(Str::snake($model));
 
         if (isset($config['values'])) {
-            $instance->setValues($config['values']);
+            $instance->values = $config['values'];
         }
+
+        $instance->addColumnDefinitions($config['columns']);
 
         return $instance;
     }
@@ -78,7 +57,10 @@ class ModelDefinition
     public function addColumnDefinitions(array $definitions): void
     {
         collect($definitions)->each(function (string $columnDefinition, string $name) {
-            $column = ColumnParser::parse($name, $columnDefinition);
+            $column = ColumnParser::parse($this->model, $name, $columnDefinition);
+            if (isset($this->values[$name])) {
+                $column->values = $this->values[$name];
+            }
             $this->addColumn($column);
         });
     }
@@ -94,7 +76,7 @@ class ModelDefinition
     /**
      * @return Collection|Column[]
      */
-    public function getColumns()
+    public function getColumns(): Collection
     {
         return $this->columnBag;
     }
@@ -155,21 +137,5 @@ class ModelDefinition
         return $this->columnBag->filter(function (Column $column) {
                 return $column->phpDataType === 'Carbon';
             })->count() > 0;
-    }
-
-    /**
-     * @param array $values
-     */
-    public function setValues(array $values): void
-    {
-        $this->values = $values;
-    }
-
-    /**
-     * @return array
-     */
-    public function getValues(): array
-    {
-        return $this->values;
     }
 }

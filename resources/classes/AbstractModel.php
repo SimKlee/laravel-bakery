@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Repositories\AbstractRepository;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,5 +37,13 @@ abstract class AbstractModel extends Model
     public function getModelName(): string
     {
         return class_basename($this);
+    }
+
+    /**
+     * @return AbstractRepository
+     */
+    public static function repository(): AbstractRepository
+    {
+        return AbstractRepository::create(static::class);
     }
 }

@@ -59,7 +59,7 @@ class ModelWriter extends Stub
         $this->uses->add($extends);
 
         $this->replace('extends', class_basename($extends))
-             ->replace('model', $this->modelDefinition->getModel())
+             ->replace('Model', $this->modelDefinition->getModel())
              ->replace('properties', $this->getPropertiesString())
              ->replace('constants', $this->getConstantsString())
              ->replace('table', $this->modelDefinition->getTable())
@@ -67,7 +67,8 @@ class ModelWriter extends Stub
              ->replace('uses', $this->getUses())
              ->replace('guarded', $this->getGuarded())
              ->replace('casts', $this->getCasts())
-             ->replace('dates', $this->getDates());
+             ->replace('dates', $this->getDates())
+             ->replace('valueConstants', $this->getValueConstants());
 
         return parent::write($file, $override);
     }
@@ -82,12 +83,12 @@ class ModelWriter extends Stub
         if ($this->modelDefinition->hasTimestamps()) {
 
             // @TODO: find a better solution to add the model information to the column
-            $createdAt = ColumnParser::parse('created_at', 'timestamp');
+            $createdAt        = ColumnParser::parse('created_at', 'timestamp');
             $createdAt->model = $this->modelDefinition->getModel();
             $this->modelDefinition->addColumn($createdAt);
 
             // @TODO: find a better solution to add the model information to the column
-            $updatedAt = ColumnParser::parse('updated_at', 'timestamp');
+            $updatedAt        = ColumnParser::parse('updated_at', 'timestamp');
             $updatedAt->model = $this->modelDefinition->getModel();
             $this->modelDefinition->addColumn($updatedAt);
         }
@@ -185,5 +186,24 @@ class ModelWriter extends Stub
             })->map(function (Column $column) {
                 return sprintf('        self::PROPERTY_%s => \'%s\',', Str::upper($column->name), $column->phpDataType);
             })->implode(PHP_EOL);
+    }
+
+    private function getValueConstants(): string
+    {
+        $valueConstants = [];
+
+        foreach ($this->modelDefinition->getValues() as $column => $values) {
+            foreach ($values as $value) {
+                $valueConstants[] = sprintf(
+                    '%sconst %s_%s = \'%s\';',
+                    "\t",
+                    Str::upper($column),
+                    Str::upper($value),
+                    $value
+                );
+            }
+        }
+
+        return implode(PHP_EOL, $valueConstants);
     }
 }

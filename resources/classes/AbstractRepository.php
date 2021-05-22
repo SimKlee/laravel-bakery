@@ -15,7 +15,7 @@ abstract class AbstractRepository
      */
     public static function create(string $modelClass): AbstractRepository
     {
-        $object = sprintf('\App\Models\Repositories\%sRepository', class_basename($modelClass));
+        $object = sprintf('App\Models\Repositories\%sRepository', class_basename($modelClass));
         return new $object();
     }
 }
