@@ -9,7 +9,7 @@ use SimKlee\LaravelBakery\Model\Column\Exceptions\ColumnComponentValidationExcep
  * Class AbstractColumnComponent
  * @package SimKlee\LaravelBakery\Model\Column
  */
-abstract class AbstractColumnComponent implements ColumnParserPipeline
+abstract class AbstractColumnComponent implements ColumnPipeline
 {
     protected Column $column;
     protected array  $validationErrors = [];

@@ -8,7 +8,7 @@ use Closure;
  * Interface ColumnParserPipeline
  * @package SimKlee\LaravelBakery\Model\Column
  */
-interface ColumnParserPipeline
+interface ColumnPipeline
 {
     /**
      * @param Column  $column

@@ -4,6 +4,10 @@ namespace SimKlee\LaravelBakery\Model\Column\Validators;
 
 use SimKlee\LaravelBakery\Model\Column\Column;
 
+/**
+ * Class AbstractValidator
+ * @package SimKlee\LaravelBakery\Model\Column\Validators
+ */
 abstract class AbstractValidator
 {
     // @TODO: strict mode for warnings
