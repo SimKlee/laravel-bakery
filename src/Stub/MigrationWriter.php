@@ -6,6 +6,8 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use SimKlee\LaravelBakery\Database\Migration\ColumnHelper;
 use SimKlee\LaravelBakery\Models\Column;
 use SimKlee\LaravelBakery\Models\ModelDefinition;
+use SimKlee\LaravelBakery\Stub\Formatter\AbstractFormatter;
+use SimKlee\LaravelBakery\Stub\Formatter\ColumnDefinitions;
 use Str;
 
 /**

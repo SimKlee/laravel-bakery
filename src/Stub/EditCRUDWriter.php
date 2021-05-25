@@ -5,6 +5,7 @@ namespace SimKlee\LaravelBakery\Stub;
 use SimKlee\LaravelBakery\Models\Column;
 use SimKlee\LaravelBakery\Models\ModelDefinition;
 use SimKlee\LaravelBakery\Models\Views\AbstractColumnViewComponent;
+use SimKlee\LaravelBakery\Stub\Formatter\ViewComponents;
 
 /**
  * Class EditCRUDWriter

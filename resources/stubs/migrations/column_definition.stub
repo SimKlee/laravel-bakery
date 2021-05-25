@@ -1,0 +1,1 @@
+            $table->{{ method }}({{ params }}){{ attributeMethods }};
