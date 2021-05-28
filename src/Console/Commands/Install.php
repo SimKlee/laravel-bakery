@@ -31,19 +31,36 @@ class Install extends Command
      */
     public function handle(): int
     {
+        $this->publishConfig();
+        $this->createDirectories();
+        $this->publishClasses();
+        $this->publishViewComponents();
+        $this->publishValidationRules();
+
+        return 0;
+    }
+
+    private function publishConfig(): void
+    {
         $this->info('Publishing package config...');
         $arguments = ['--tag' => 'config'];
         if ($this->option(self::OPTION_FORCE)) {
             $arguments['--force'] = true;
         }
         $this->call('vendor:publish', $arguments);
+    }
 
+    private function createDirectories(): void
+    {
         $this->info(PHP_EOL);
         $this->info('Creating directories...');
         collect(LaravelBakeryServiceProvider::createDirectories())->each(function (string $line) {
             $this->info($line);
         });
+    }
 
+    private function publishClasses(): void
+    {
         $this->info(PHP_EOL);
         $this->info('Publishing package classes...');
         $arguments = ['--tag' => 'classes'];
@@ -51,7 +68,10 @@ class Install extends Command
             $arguments['--force'] = true;
         }
         $this->call('vendor:publish', $arguments);
+    }
 
+    private function publishViewComponents(): void
+    {
         $this->info(PHP_EOL);
         $this->info('Publishing view components...');
         $arguments = ['--tag' => 'view_components'];
@@ -59,7 +79,16 @@ class Install extends Command
             $arguments['--force'] = true;
         }
         $this->call('vendor:publish', $arguments);
+    }
 
-        return 0;
+    private function publishValidationRules(): void
+    {
+        $this->info(PHP_EOL);
+        $this->info('Publishing validation rules...');
+        $arguments = ['--tag' => 'rules'];
+        if ($this->option(self::OPTION_FORCE)) {
+            $arguments['--force'] = true;
+        }
+        $this->call('vendor:publish', $arguments);
     }
 }

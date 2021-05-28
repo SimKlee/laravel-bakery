@@ -1,7 +1,7 @@
 <?php
 return [
     'model' => [
-        'base_model' => App\Models\AbstractModel::class,
+        'base_model' => 'App\Models\AbstractModel',
     ],
     'view'  => [
         'layout'  => 'layouts.app',

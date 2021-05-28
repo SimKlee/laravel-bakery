@@ -6,12 +6,14 @@ use File;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
 use SimKlee\LaravelBakery\File\ConsoleFileHelper;
+use SimKlee\LaravelBakery\Generator\AbstractWriter;
+use SimKlee\LaravelBakery\Generator\MigrationWriter;
+use SimKlee\LaravelBakery\Generator\ModelFactoryWriter;
+use SimKlee\LaravelBakery\Generator\ModelRepositoryWriter;
+use SimKlee\LaravelBakery\Generator\ModelWriter;
+use SimKlee\LaravelBakery\Model\Exceptions\WrongForeignKeyDefinitionException;
+use SimKlee\LaravelBakery\Model\ModelDefinition;
 use SimKlee\LaravelBakery\Model\ModelDefinitionsBag;
-use SimKlee\LaravelBakery\Providers\LaravelBakeryServiceProvider;
-use SimKlee\LaravelBakery\Stub\FactoryWriter;
-use SimKlee\LaravelBakery\Stub\MigrationWriter;
-use SimKlee\LaravelBakery\Stub\ModelWriter;
-use SimKlee\LaravelBakery\Stub\Stub;
 use Str;
 
 /**
@@ -20,17 +22,16 @@ use Str;
  */
 class BakeModel extends AbstractBake
 {
-    private const ARGUMENT_MODEL  = 'model';
-    private const OPTION_ABSTRACT = 'abstract';
-    private const OPTION_ALL      = 'all';
-    private const OPTION_CONFIG   = 'config';
-    private const OPTION_SAMPLE   = 'sample';
+    private const ARGUMENT_MODEL = 'model';
+    private const OPTION_ALL     = 'all';
+    private const OPTION_FORCE   = 'force';
+    private const OPTION_CONFIG  = 'config';
+    private const OPTION_SAMPLE  = 'sample';
 
     /**
      * @var string
      */
     protected $signature = 'bake:model {model?}
-                                       {--abstract : Copies a abstract model to your app models folder}
                                        {--all : Generate all models in config file}
                                        {--config= : Define the config file name (without file extension .php)}
                                        {--sample : Create a sample config file}
@@ -43,18 +44,8 @@ class BakeModel extends AbstractBake
 
     /**
      * @return int
-     */
-    public function handleAbstract(): int
-    {
-        if (File::copy(__DIR__ . '/../../../resources/classes/AbstractModel.php', app_path('Models/AbstractModel.php'))) {
-            $this->info('Created app/Models/AbstractModel.php');
-        }
-
-        return 0;
-    }
-
-    /**
-     * @return int
+     * @throws FileNotFoundException
+     * @throws WrongForeignKeyDefinitionException
      */
     public function handle(): int
     {
@@ -69,10 +60,6 @@ class BakeModel extends AbstractBake
             });
 
             return 0;
-        }
-
-        if ($this->option(self::OPTION_ABSTRACT)) {
-            return $this->handleAbstract();
         }
 
         if ($this->option(self::OPTION_CONFIG)) {
@@ -104,13 +91,6 @@ class BakeModel extends AbstractBake
         return $this->handleModel($model);
     }
 
-    /**
-     * @param string      $model
-     * @param Carbon|null $timestamp
-     *
-     * @return int
-     * @throws FileNotFoundException
-     */
     private function handleModel(string $model, Carbon $timestamp = null): int
     {
         if (is_null($timestamp)) {
@@ -118,175 +98,63 @@ class BakeModel extends AbstractBake
         }
 
         $this->info('Processing ' . $model);
-        $modelDefinition = new ModelDefinition($model, $this->configuration[ $model ]['table'], $this->configuration[ $model ]['timestamps']);
-        $modelDefinition->addColumnDefinitions($this->configuration[ $model ]['columns']);
-        if (isset($this->configuration[ $model ]['values'])) {
-            $modelDefinition->setValues($this->configuration[ $model ]['values']);
-        }
 
-        if ($this->writeModelClass($model)) {
-            $this->info(sprintf('Written model "%s" successfully.', $model));
-        }
+        $modelDefinition = $this->modelDefinitionsBag->getModelDefinition($model);
 
-        if ($this->writeModelRepositoryClass($model)) {
-            $this->info(sprintf('Written model repository for "%s" successfully.', $model));
-        }
-
-        if ($this->writeMigrationFile($model, $timestamp->format('Y_m_d_His'))) {
-            $this->info(sprintf('Written migration for "%s" successfully.', $model));
-        }
-
-        if ($this->writeModelFactory($model)) {
-            $this->info(sprintf('Written factory for "%s" successfully.', $model));
-        }
-
-        $this->info('');
-
-        return 0;
-    }
-
-    private function writeModelFactory(string $model): bool
-    {
-        $file     = database_path(sprintf('factories/%sFactory.php', $model));
-        $override = true;
-        if (!$this->option('force') && File::exists($file)) {
-            $override = $this->choice(
-                    sprintf('Factory "%s" already exists. Overwrite?', $model),
-                    ['y' => 'yes', 'n' => 'no'],
-                    'no'
-                ) === 'y';
-        }
-
-        if (!$override) {
-            $this->warn(sprintf('Writing factory "%s" skipped.', $model));
-
-            return false;
-        }
-
-        return FactoryWriter::fromModelDefinition($this->modelDefinitionsBag->getModelDefinition($model))
-                            ->write($file, $override) !== false;
-    }
-
-    /**
-     * @return int
-     */
-    private function createSample(): int
-    {
-        $file = config_path($this->configFile);
-
-        try {
-            if ($this->fileHelper->put($file, File::get(ConsoleFileHelper::getResourcePath('config_sample.stub')))) {
-                $this->info(sprintf('Written config sample into "%s" successfully.', $file));
-            } else {
-                $this->warn(sprintf('Skipped writing config sample into "%s".', $file));
-            }
-        } catch (FileNotFoundException $e) {
-            $this->error($e->getMessage());
-
-            return 1;
-        }
-
-        return 0;
-    }
-
-    /**
-     * @param string $model
-     *
-     * @return bool
-     * @throws FileNotFoundException
-     */
-    private function writeModelClass(string $model): bool
-    {
-        $file     = app_path(sprintf('Models/%s.php', $model));
-        $override = true;
-        if (!$this->option('force') && File::exists($file)) {
-            $override = $this->choice(
-                    sprintf('Model "%s" already exists. Overwrite?', $model),
-                    ['y' => 'yes', 'n' => 'no'],
-                    'no'
-                ) === 'y';
-        }
-
-        if (!$override) {
-            $this->warn(sprintf('Writing model "%s" skipped.', $model));
-
-            return false;
-        }
-
-        return ModelWriter::fromModelDefinition($this->modelDefinitionsBag->getModelDefinition($model))
-                          ->write($file, $override) !== false;
-    }
-
-    /**
-     * @param string $model
-     *
-     * @return bool
-     * @throws FileNotFoundException
-     */
-    private function writeModelRepositoryClass(string $model): bool
-    {
-        $path = app_path('Models/Repositories');
-        if (!File::isDirectory($path)) {
-            File::makeDirectory($path);
-            $this->info(sprintf('Created directory %s', $path));
-        }
-
-        if (!File::exists(app_path('Models/Repositories/AbstractRepository.php'))) {
-            File::copy(LaravelBakeryServiceProvider::getResourcePath('classes/AbstractRepository.php'), app_path('Models/Repositories/AbstractRepository.php'));
-            $this->info('Copied abstract repository to app/Models/Repository');
-        }
-
-        $file     = sprintf('%s/%sRepository.php', $path, $model);
-        $override = true;
-        if (!$this->option('force') && File::exists($file)) {
-            $override = $this->choice(
-                    sprintf('Model repository for "%s" already exists. Overwrite?', $model),
-                    ['y' => 'yes', 'n' => 'no'],
-                    'no'
-                ) === 'y';
-        }
-
-        if (!$override) {
-            $this->warn(sprintf('Writing model repository for "%s" skipped.', $model));
-
-            return false;
-        }
-
-        $stub = new Stub('repository.stub');
-        $stub->replace('Model', $model);
-
-        return $stub->write($file, $override) !== false;
-    }
-
-    /**
-     * @param string      $model
-     * @param string|null $timestamp
-     *
-     * @return bool
-     * @throws FileNotFoundException
-     */
-    private function writeMigrationFile(string $model, string $timestamp = null): bool
-    {
-        if (is_null($timestamp)) {
-            $timestamp = Carbon::now()->format('Y_m_d_His');
-        }
-
-        $file = base_path(
-            sprintf('database/migrations/%s_create_%s_table.php', $timestamp, Str::plural(Str::snake($model)))
+        $this->write(
+            new ModelWriter($modelDefinition),
+            app_path(sprintf('Models/%s.php', $model)),
+            'model class'
         );
 
-        /**
-         * @todo
-         *
-         * check if migration exists
-         * - parse through all migration files get T_CLASS bei get_all_tokens() and check class name
-         *
-         * - rollback specific migration via migrate:rollback --path=migration_file.php
-         *      OR
-         * - delete old migration and show hint: run artisan:migration:fresh
-         */
+        $this->write(
+            new ModelRepositoryWriter($modelDefinition),
+            app_path(sprintf('Models/Repositories/%sRepository.php', $model)),
+            'model repository'
+        );
 
-        return MigrationWriter::fromModelDefinition($this->modelDefinitionsBag->getModelDefinition($model))
-                              ->write($file, true) !== false;
+        $this->write(
+            new ModelFactoryWriter($modelDefinition),
+            database_path(sprintf('factories/%sFactory.php', $model)),
+            'model factory'
+        );
+
+        $this->write(
+            new MigrationWriter($modelDefinition),
+            base_path(
+                sprintf('database/migrations/%s_create_%s_table.php', $timestamp->format('Y_m_d_His'), Str::plural(Str::snake($model)))
+            ),
+            'model migration'
+        );
+
+        return 0;
+    }
+
+    private function write(AbstractWriter $writer, string $file, string $type): void
+    {
+        $override = true;
+        if (!$this->option(self::OPTION_FORCE) && File::exists($file)) {
+            $override = $this->choice(
+                    sprintf('%s "%s" already exists. Overwrite?', $type, $file),
+                    ['y' => 'yes', 'n' => 'no'],
+                    'no'
+                ) === 'y';
+        }
+
+        if (!$override) {
+            $this->warn(sprintf('Generating %s "%s" skipped.', $type, $file));
+
+            return;
+        }
+
+        $written = $writer->write($file, $override);
+
+        if ($written !== false) {
+            $this->info(sprintf('Generated %s "%s"', $type, $file));
+
+            return;
+        }
+
+        $this->error(sprintf('Generating %s "%s" failed!', $type, $file));
     }
 }

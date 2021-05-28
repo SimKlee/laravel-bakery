@@ -30,6 +30,7 @@ class LaravelBakeryServiceProvider extends ServiceProvider
 
             $this->publishClasses();
             $this->publishViewComponents();
+            $this->publishValidationRules();
         }
     }
 
@@ -57,14 +58,15 @@ class LaravelBakeryServiceProvider extends ServiceProvider
 
     public static function createDirectories(): array
     {
-        $output      = [];
         $directories = [
             app_path('Models/Repositories'),
             app_path('Http/Requests'),
             app_path('View/Components'),
+            app_path('Rules'),
             resource_path('views/components'),
         ];
 
+        $output = [];
         collect($directories)->each(function (string $directory) use (&$output) {
             if (!File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0775, true);
@@ -103,7 +105,27 @@ class LaravelBakeryServiceProvider extends ServiceProvider
             $publish[ __DIR__ . '/../../resources/classes/view_components/' . $class ] = app_path('View/Components/' . $class);
             $publish[ __DIR__ . '/../../resources/views/components/' . $view ]         = resource_path('views/components/' . $view);
         }
-
         $this->publishes($publish, 'view_components');
+    }
+
+    private function publishValidationRules(): void
+    {
+        $components = [
+            'AbstractIntegerRule.php',
+            'SignedIntegerRule.php',
+            'SignedMediumIntegerRule.php',
+            'SignedSmallIntegerRule.php',
+            'SignedTinyIntegerRule.php',
+            'UnsignedIntegerRule.php',
+            'UnsignedMediumIntegerRule.php',
+            'UnsignedSmallIntegerRule.php',
+            'UnsignedTinyIntegerRule.php',
+        ];
+
+        $publish = [];
+        foreach ($components as $class) {
+            $publish[ __DIR__ . '/../../resources/classes/rules/' . $class ] = app_path('Rules/' . $class);
+        }
+        $this->publishes($publish, 'rules');
     }
 }

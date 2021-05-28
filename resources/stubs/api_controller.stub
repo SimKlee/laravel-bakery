@@ -14,11 +14,6 @@ use Illuminate\Http\Response;
  */
 class {{ Model }}Controller extends Controller
 {
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     public function index(Request $request): JsonResponse
     {
         $query = {{ Model }}::query()->select({{ Model }}::column('*'));
@@ -36,12 +31,6 @@ class {{ Model }}Controller extends Controller
 
     }
 
-    /**
-     * @param Request $request
-     * @param int     ${{ model }}
-     *
-     * @return JsonResponse
-     */
     public function show(Request $request, int ${{ model }}): JsonResponse
     {
         $item       = {{ Model }}::find($product);
