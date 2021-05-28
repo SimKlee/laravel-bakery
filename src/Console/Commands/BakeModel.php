@@ -3,17 +3,13 @@
 namespace SimKlee\LaravelBakery\Console\Commands;
 
 use File;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Carbon;
-use SimKlee\LaravelBakery\File\ConsoleFileHelper;
 use SimKlee\LaravelBakery\Generator\AbstractWriter;
 use SimKlee\LaravelBakery\Generator\MigrationWriter;
 use SimKlee\LaravelBakery\Generator\ModelFactoryWriter;
 use SimKlee\LaravelBakery\Generator\ModelRepositoryWriter;
 use SimKlee\LaravelBakery\Generator\ModelWriter;
 use SimKlee\LaravelBakery\Model\Exceptions\WrongForeignKeyDefinitionException;
-use SimKlee\LaravelBakery\Model\ModelDefinition;
-use SimKlee\LaravelBakery\Model\ModelDefinitionsBag;
 use Str;
 
 /**
@@ -24,9 +20,9 @@ class BakeModel extends AbstractBake
 {
     private const ARGUMENT_MODEL = 'model';
     private const OPTION_ALL     = 'all';
-    private const OPTION_FORCE   = 'force';
-    private const OPTION_CONFIG  = 'config';
-    private const OPTION_SAMPLE  = 'sample';
+
+    private const OPTION_CONFIG = 'config';
+    private const OPTION_SAMPLE = 'sample';
 
     /**
      * @var string
@@ -35,7 +31,7 @@ class BakeModel extends AbstractBake
                                        {--all : Generate all models in config file}
                                        {--config= : Define the config file name (without file extension .php)}
                                        {--sample : Create a sample config file}
-                                       {--force}';
+                                       {--force : Override existing files!}';
 
     /**
      * @var string
@@ -44,32 +40,15 @@ class BakeModel extends AbstractBake
 
     /**
      * @return int
-     * @throws FileNotFoundException
      * @throws WrongForeignKeyDefinitionException
      */
     public function handle(): int
     {
+        $this->handleConfig();
         $this->loadConfiguration();
-        $this->modelDefinitionsBag = ModelDefinitionsBag::fromConfig($this->configuration);
 
         if ($this->option(self::OPTION_ALL)) {
-            $timestamp = Carbon::now();
-            collect(array_keys($this->configuration))->each(function (string $model) use ($timestamp) {
-                $timestamp->addSecond();
-                $this->handleModel($model, $timestamp);
-            });
-
-            return 0;
-        }
-
-        if ($this->option(self::OPTION_CONFIG)) {
-            $file = $this->option(self::OPTION_CONFIG) . '.php';
-            if (!$this->option(self::OPTION_SAMPLE) && !File::exists(config_path($file))) {
-                $this->error('Given config file does not exists!');
-
-                return 1;
-            }
-            $this->configFile = $file;
+            return $this->handleAll();
         }
 
         if ($this->option(self::OPTION_SAMPLE)) {
@@ -89,6 +68,30 @@ class BakeModel extends AbstractBake
         }
 
         return $this->handleModel($model);
+    }
+
+    private function handleAll(): int
+    {
+        $timestamp = Carbon::now();
+        collect(array_keys($this->configuration))->each(function (string $model) use ($timestamp) {
+            $timestamp->addSecond();
+            $this->handleModel($model, $timestamp);
+        });
+
+        return 0;
+    }
+
+    private function handleConfig(): void
+    {
+        if ($this->option(self::OPTION_CONFIG)) {
+            $file = $this->option(self::OPTION_CONFIG) . '.php';
+            if (!$this->option(self::OPTION_SAMPLE) && !File::exists(config_path($file))) {
+                $this->error('Given config file does not exists!');
+
+                exit(1);
+            }
+            $this->configFile = $file;
+        }
     }
 
     private function handleModel(string $model, Carbon $timestamp = null): int
@@ -132,22 +135,7 @@ class BakeModel extends AbstractBake
 
     private function write(AbstractWriter $writer, string $file, string $type): void
     {
-        $override = true;
-        if (!$this->option(self::OPTION_FORCE) && File::exists($file)) {
-            $override = $this->choice(
-                    sprintf('%s "%s" already exists. Overwrite?', $type, $file),
-                    ['y' => 'yes', 'n' => 'no'],
-                    'no'
-                ) === 'y';
-        }
-
-        if (!$override) {
-            $this->warn(sprintf('Generating %s "%s" skipped.', $type, $file));
-
-            return;
-        }
-
-        $written = $writer->write($file, $override);
+        $written = $writer->write($file, $this->override($type, $file));
 
         if ($written !== false) {
             $this->info(sprintf('Generated %s "%s"', $type, $file));

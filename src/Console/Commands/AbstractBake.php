@@ -2,6 +2,7 @@
 
 namespace SimKlee\LaravelBakery\Console\Commands;
 
+use File;
 use Illuminate\Console\Command;
 use SimKlee\LaravelBakery\File\ConsoleFileHelper;
 use SimKlee\LaravelBakery\Model\ModelDefinitionsBag;
@@ -12,6 +13,8 @@ use SimKlee\LaravelBakery\Model\ModelDefinitionsBag;
  */
 abstract class AbstractBake extends Command
 {
+    protected const OPTION_FORCE = 'force';
+
     protected ConsoleFileHelper   $fileHelper;
     protected string              $configFile    = 'models.php';
     protected array               $configuration = [];
@@ -64,5 +67,19 @@ abstract class AbstractBake extends Command
     {
         $this->configuration       = config(substr($this->configFile, 0, -4));
         $this->modelDefinitionsBag = ModelDefinitionsBag::fromConfig($this->configuration);
+    }
+
+    protected function override(string $type, string $file): bool
+    {
+        $override = true;
+        if (!$this->option(self::OPTION_FORCE) && File::exists($file)) {
+            $override = $this->choice(
+                    sprintf('%s "%s" already exists. Overwrite?', $type, $file),
+                    ['y' => 'yes', 'n' => 'no'],
+                    'no'
+                ) === 'y';
+        }
+
+        return $override;
     }
 }
