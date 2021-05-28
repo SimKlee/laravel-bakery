@@ -12,7 +12,7 @@ use SimKlee\LaravelBakery\Providers\LaravelBakeryServiceProvider;
  *
  * @see     https://stillat.com/blog/2016/12/03/custom-command-styles-with-laravel-artisan
  */
-class Install extends Command
+class InstallBakery extends Command
 {
     const OPTION_FORCE = 'force';
 
@@ -34,7 +34,27 @@ class Install extends Command
         $this->publishConfig();
         $this->createDirectories();
         $this->publishClasses();
+
         $this->publishViewComponents();
+        $this->info('Datepicker View Component has some dependencies:');
+        $this->info('Run: npm install bootstrap-datepicker --save');
+        $this->info("Add to resources/sass/app.scss: @import '~bootstrap-datepicker/dist/css/bootstrap-datepicker.css';");
+        $this->info("Add to resources/js/app.js: import 'bootstrap-datepicker/js/bootstrap-datepicker';");
+        /*
+         * @TODO: find a good way for the dependencies!!
+        $(function () {
+            $.fn.datepicker.dates['de'] = {
+                days:        ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+                daysShort:   ['Son', 'Mon', 'Die', 'Mit', 'Don', 'Fre', 'Sam'],
+                daysMin:     ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+                months:      ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+                monthsShort: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+                today:       new Date(),
+            };
+        });
+         */
+        $this->info('Run: npm run dev');
+
         $this->publishValidationRules();
 
         return 0;

@@ -2,13 +2,11 @@
 
 namespace App\Rules;
 
-use Illuminate\Contracts\Validation\Rule;
-
 /**
  * Class AbstractIntegerRule
  * @package App\Rules
  */
-abstract class AbstractIntegerRule implements Rule
+abstract class AbstractIntegerRule extends AbstractRule
 {
     protected int $min = 0;
     protected int $max = 0;

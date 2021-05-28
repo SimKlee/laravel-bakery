@@ -4,7 +4,9 @@ namespace SimKlee\LaravelBakery\Console\Commands;
 
 use File;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use SimKlee\LaravelBakery\File\ConsoleFileHelper;
+use SimKlee\LaravelBakery\Generator\AbstractWriter;
 use SimKlee\LaravelBakery\Model\ModelDefinitionsBag;
 
 /**
@@ -85,4 +87,70 @@ abstract class AbstractBake extends Command
 
         return $override;
     }
+
+    protected function handleConfig(): void
+    {
+        if ($this->option(self::OPTION_CONFIG)) {
+            $file = $this->option(self::OPTION_CONFIG) . '.php';
+            if (!$this->option(self::OPTION_SAMPLE) && !File::exists(config_path($file))) {
+                $this->error('Given config file does not exists!');
+
+                exit(1);
+            }
+            $this->configFile = $file;
+        }
+    }
+
+    protected function write(AbstractWriter $writer, string $file, string $type): void
+    {
+        $written = $writer->write($file, $this->override($type, $file));
+
+        if ($written !== false) {
+            $this->info(sprintf('Generated %s "%s"', $type, $file));
+
+            return;
+        }
+
+        $this->error(sprintf('Generating %s "%s" failed!', $type, $file));
+    }
+
+    protected function handleAll(): int
+    {
+        $timestamp = Carbon::now();
+        collect(array_keys($this->configuration))->each(function (string $model) use ($timestamp) {
+            $timestamp->addSecond();
+            $this->handleModel($model, $timestamp);
+        });
+
+        return 0;
+    }
+
+    public function handle(): int
+    {
+        $this->handleConfig();
+        $this->loadConfiguration();
+
+        if ($this->option(self::OPTION_ALL)) {
+            return $this->handleAll();
+        }
+
+
+
+        $model = $this->argument(self::ARGUMENT_MODEL);
+        if ($model && !isset($this->configuration[ $model ])) {
+            $this->error(sprintf('Model "%s" is not defined in config file "%s"!', $model, $this->configFile));
+            $this->showModels();
+
+            return 1;
+        }
+
+        if (!$model) {
+            $model = $this->askForModel();
+        }
+
+        return $this->handleModel($model);
+    }
+
+    abstract protected function handleModel(string $model, Carbon $timestamp = null): int;
+
 }

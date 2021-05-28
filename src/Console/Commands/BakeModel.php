@@ -30,63 +30,16 @@ class BakeModel extends AbstractBake
     /** @var string */
     protected $description = 'Bake a new model from a config file.';
 
-    /**
-     * @return int
-     * @throws WrongForeignKeyDefinitionException
-     */
     public function handle(): int
     {
-        $this->handleConfig();
-        $this->loadConfiguration();
-
-        if ($this->option(self::OPTION_ALL)) {
-            return $this->handleAll();
-        }
-
         if ($this->option(self::OPTION_SAMPLE)) {
             return $this->createSample();
         }
 
-        $model = $this->argument(self::ARGUMENT_MODEL);
-        if ($model && !isset($this->configuration[ $model ])) {
-            $this->error(sprintf('Model "%s" is not defined in config file "%s"!', $model, $this->configFile));
-            $this->showModels();
-
-            return 1;
-        }
-
-        if (!$model) {
-            $model = $this->askForModel();
-        }
-
-        return $this->handleModel($model);
+        return parent::handle();
     }
 
-    private function handleAll(): int
-    {
-        $timestamp = Carbon::now();
-        collect(array_keys($this->configuration))->each(function (string $model) use ($timestamp) {
-            $timestamp->addSecond();
-            $this->handleModel($model, $timestamp);
-        });
-
-        return 0;
-    }
-
-    private function handleConfig(): void
-    {
-        if ($this->option(self::OPTION_CONFIG)) {
-            $file = $this->option(self::OPTION_CONFIG) . '.php';
-            if (!$this->option(self::OPTION_SAMPLE) && !File::exists(config_path($file))) {
-                $this->error('Given config file does not exists!');
-
-                exit(1);
-            }
-            $this->configFile = $file;
-        }
-    }
-
-    private function handleModel(string $model, Carbon $timestamp = null): int
+    protected function handleModel(string $model, Carbon $timestamp = null): int
     {
         if (is_null($timestamp)) {
             $timestamp = Carbon::now();
@@ -123,18 +76,5 @@ class BakeModel extends AbstractBake
         );
 
         return 0;
-    }
-
-    private function write(AbstractWriter $writer, string $file, string $type): void
-    {
-        $written = $writer->write($file, $this->override($type, $file));
-
-        if ($written !== false) {
-            $this->info(sprintf('Generated %s "%s"', $type, $file));
-
-            return;
-        }
-
-        $this->error(sprintf('Generating %s "%s" failed!', $type, $file));
     }
 }

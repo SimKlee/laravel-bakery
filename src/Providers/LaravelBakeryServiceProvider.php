@@ -4,10 +4,13 @@ namespace SimKlee\LaravelBakery\Providers;
 
 use File;
 use Illuminate\Support\ServiceProvider;
+use SimKlee\LaravelBakery\Console\Commands\BakeModel;
+use SimKlee\LaravelBakery\Console\Commands\BakeModelAPI;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelAPICommand;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelCommand;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelCRUDCommand;
-use SimKlee\LaravelBakery\Console\Commands\Install;
+use SimKlee\LaravelBakery\Console\Commands\BakeModelViews;
+use SimKlee\LaravelBakery\Console\Commands\InstallBakery;
 
 class LaravelBakeryServiceProvider extends ServiceProvider
 {
@@ -17,10 +20,10 @@ class LaravelBakeryServiceProvider extends ServiceProvider
 
             // commands
             $this->commands([
-                Install::class,
-                BakeModelCommand::class,
-                BakeModelCRUDCommand::class,
-                BakeModelAPICommand::class,
+                InstallBakery::class,
+                BakeModel::class,
+                BakeModelAPI::class,
+                BakeModelViews::class,
             ]);
 
             // config files
@@ -112,6 +115,7 @@ class LaravelBakeryServiceProvider extends ServiceProvider
     {
         $components = [
             'AbstractIntegerRule.php',
+            'AbstractRule.php',
             'SignedIntegerRule.php',
             'SignedMediumIntegerRule.php',
             'SignedSmallIntegerRule.php',
