@@ -13,7 +13,10 @@ use SimKlee\LaravelBakery\Model\ModelDefinitionsBag;
  */
 abstract class AbstractBake extends Command
 {
-    protected const OPTION_FORCE = 'force';
+    protected const ARGUMENT_MODEL = 'model';
+    protected const OPTION_ALL     = 'all';
+    protected const OPTION_FORCE   = 'force';
+    protected const OPTION_CONFIG  = 'config';
 
     protected ConsoleFileHelper   $fileHelper;
     protected string              $configFile    = 'models.php';

@@ -18,24 +18,16 @@ use Str;
  */
 class BakeModel extends AbstractBake
 {
-    private const ARGUMENT_MODEL = 'model';
-    private const OPTION_ALL     = 'all';
-
-    private const OPTION_CONFIG = 'config';
     private const OPTION_SAMPLE = 'sample';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $signature = 'bake:model {model?}
                                        {--all : Generate all models in config file}
                                        {--config= : Define the config file name (without file extension .php)}
                                        {--sample : Create a sample config file}
                                        {--force : Override existing files!}';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $description = 'Bake a new model from a config file.';
 
     /**
