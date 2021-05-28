@@ -4,10 +4,13 @@ namespace SimKlee\LaravelBakery\Console\Commands;
 
 use File;
 use Illuminate\Console\Command;
+use SimKlee\LaravelBakery\Providers\LaravelBakeryServiceProvider;
 
 /**
  * Class Install
  * @package SimKlee\LaravelBakery\Console\Commands
+ *
+ * @see     https://stillat.com/blog/2016/12/03/custom-command-styles-with-laravel-artisan
  */
 class Install extends Command
 {
@@ -28,33 +31,19 @@ class Install extends Command
      */
     public function handle(): int
     {
-        $this->createDirectories();
-        $this->publishClasses();
-
-        return 0;
-    }
-
-    private function createDirectories(): void
-    {
-        $directories = [
-            app_path('Models/Repositories'),
-            app_path('Http/Requests'),
-        ];
+        $this->info('Publishing package config...');
+        $arguments = ['--tag' => 'config'];
+        if ($this->option(self::OPTION_FORCE)) {
+            $arguments['--force'] = true;
+        }
+        $this->call('vendor:publish', $arguments);
 
         $this->info(PHP_EOL);
         $this->info('Creating directories...');
-        collect($directories)->each(function (string $directory) {
-            if (!File::isDirectory($directory)) {
-                File::makeDirectory($directory);
-                $this->info(sprintf('Created directory %s.', $directory));
-            } else {
-                $this->warn(sprintf('Directory %s already exists.', $directory));
-            }
+        collect(LaravelBakeryServiceProvider::createDirectories())->each(function (string $line) {
+            $this->info($line);
         });
-    }
 
-    private function publishClasses(): void
-    {
         $this->info(PHP_EOL);
         $this->info('Publishing package classes...');
         $arguments = ['--tag' => 'classes'];
@@ -62,5 +51,15 @@ class Install extends Command
             $arguments['--force'] = true;
         }
         $this->call('vendor:publish', $arguments);
+
+        $this->info(PHP_EOL);
+        $this->info('Publishing view components...');
+        $arguments = ['--tag' => 'view_components'];
+        if ($this->option(self::OPTION_FORCE)) {
+            $arguments['--force'] = true;
+        }
+        $this->call('vendor:publish', $arguments);
+
+        return 0;
     }
 }

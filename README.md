@@ -5,10 +5,10 @@
 composer require simklee/laravel-bakery --dev
 ```
 
-
-## Publish config files
+## Publish package files
+The install command copies all necessary classes and files.
 ```
-php artisan vendor:publish --provider="SimKlee\LaravelBakery\Providers\LaravelBakeryServiceProvider" --tag="config"
+php artisan bake:install
 ```
 
 ## Commands
