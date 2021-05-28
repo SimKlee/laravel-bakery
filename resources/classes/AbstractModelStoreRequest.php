@@ -10,16 +10,10 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 abstract class AbstractModelStoreRequest extends FormRequest
 {
-    /**
-     * @return bool
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * @return array
-     */
     abstract public function rules(): array;
 }

@@ -3,6 +3,7 @@
 namespace SimKlee\LaravelBakery\Model;
 
 use Illuminate\Support\Str;
+use SimKlee\LaravelBakery\Model\Column\Column;
 use SimKlee\LaravelBakery\Support\Collection;
 use SimKlee\LaravelBakery\Model\Column\ColumnParser;
 

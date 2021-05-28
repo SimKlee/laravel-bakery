@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace SimKlee\LaravelBakery\Stub\Formatter\Migrations;
+namespace SimKlee\LaravelBakery\Generator\Formatter\Migrations;
 
 use Illuminate\Support\Collection;
-use SimKlee\LaravelBakery\Database\Migration\ColumnHelper;
+use SimKlee\LaravelBakery\Generator\Formatter\AbstractFormatter;
+use SimKlee\LaravelBakery\Generator\Stub;
+use SimKlee\LaravelBakery\Model\Column\Exceptions\UnknownMethodForDataTypeException;
 use SimKlee\LaravelBakery\Models\Column;
-use SimKlee\LaravelBakery\Stub\Formatter\AbstractFormatter;
-use SimKlee\LaravelBakery\Stub\Stub;
 
 /**
  * Class ColumnDefinitions
@@ -26,12 +26,9 @@ class ColumnDefinitions extends AbstractFormatter
         'timestamp'     => 'timestamp',
         'boolean'       => 'boolean',
         'decimal'       => 'decimal',
-        'dateTime'       => 'dateTime',
+        'dateTime'      => 'dateTime',
     ];
 
-    /**
-     * @return string
-     */
     public function toString(): string
     {
         return $this->modelDefinition
@@ -42,40 +39,25 @@ class ColumnDefinitions extends AbstractFormatter
     }
 
     /**
-     * @param Column $column
-     *
-     * @return string
-     * @throws \Exception
+     * @throws UnknownMethodForDataTypeException
      */
     private function getColumnMigration(Column $column): string
     {
         $stub = new Stub('column_definition.stub');
-        $stub->replace('method', $this->getMethod($column))
-            ->replace('params', $this->getMethodParams($column))
-            ->replace('attributeMethods', $this->getAttributeMethods($column));
+        $stub->setVar('method', $this->getMethod($column))
+             ->setVar('params', $this->getMethodParams($column))
+             ->setVar('attributeMethods', $this->getAttributeMethods($column));
 
-        #return $stub->getContent();
-
-        $string = "\t\t\t";
-        $string .= '$table->';
-        $string .= $this->getMethod($column);
-        $string .= sprintf('(%s)', $this->getMethodParams($column));
-        $string .= $this->getAttributeMethods($column);
-        $string .= ';';
-
-        return $string;
+        return $stub->getContent();
     }
 
     /**
-     * @param Column $column
-     *
-     * @return string
-     * @throws \Exception
+     * @throws UnknownMethodForDataTypeException
      */
     private function getMethod(Column $column): string
     {
         if (!isset($this->methodMap[ $column->dataType ])) {
-            throw new \Exception('Unknown method for data type ' . $column->dataType);
+            throw new UnknownMethodForDataTypeException('Unknown method for data type ' . $column->dataType);
         }
 
         return ($column->unsigned)
@@ -83,11 +65,6 @@ class ColumnDefinitions extends AbstractFormatter
             : $this->methodMap[ $column->dataType ];
     }
 
-    /**
-     * @param Column $column
-     *
-     * @return string
-     */
     private function getMethodParams(Column $column): string
     {
         $params = collect([$column->getPropertyString()]);
@@ -113,11 +90,6 @@ class ColumnDefinitions extends AbstractFormatter
         })->implode(', ');
     }
 
-    /**
-     * @param Column $column
-     *
-     * @return string
-     */
     private function getAttributeMethods(Column $column): string
     {
         $methods = new Collection();

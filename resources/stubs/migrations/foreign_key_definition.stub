@@ -1,0 +1,3 @@
+            $table->foreign({{ column }}, '{{ name }}')
+                ->on(\App\Models\{{ ForeignModel }}::TABLE)
+                ->references(\App\Models\{{ ForeignColumn }});

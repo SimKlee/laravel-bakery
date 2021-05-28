@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelAPICommand;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelCommand;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelCRUDCommand;
+use SimKlee\LaravelBakery\Console\Commands\Install;
 
 class LaravelBakeryServiceProvider extends ServiceProvider
 {
@@ -16,6 +17,7 @@ class LaravelBakeryServiceProvider extends ServiceProvider
 
             // commands
             $this->commands([
+                Install::class,
                 BakeModelCommand::class,
                 BakeModelCRUDCommand::class,
                 BakeModelAPICommand::class,
@@ -25,6 +27,13 @@ class LaravelBakeryServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../../config/laravel-bakery.php' => config_path('laravel-bakery.php'),
             ], 'config');
+
+            // classes
+            $this->publishes([
+                __DIR__ . '/../../resources/classes/AbstractModel.php'             => app_path('Models/AbstractModel.php'),
+                __DIR__ . '/../../resources/classes/AbstractRepository.php'        => app_path('Models/Repositories/AbstractRepository.php'),
+                __DIR__ . '/../../resources/classes/AbstractModelStoreRequest.php' => app_path('Http/Requests/AbstractModelStoreRequest.php'),
+            ], 'classes');
         }
     }
 
@@ -49,5 +58,4 @@ class LaravelBakeryServiceProvider extends ServiceProvider
 
         return $resourcePath;
     }
-
 }

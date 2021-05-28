@@ -10,9 +10,11 @@ use App\Models\{{ Model }};
  */
 class {{ Model }}StoreRequest extends AbstractModelStoreRequest
 {
-    /**
-     * @return array
-     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
     public function rules(): array
     {
         return [

@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class AbstractModel
  * @package App\Models
+ *
+ * @method static AbstractModel find(mixed $id, array $columns = [])
+ * @method static AbstractModel create(array $attributes = [])
+ * @method static AbstractModel firstOrCreate(array $attributes = [], array $values = [])
  */
 abstract class AbstractModel extends Model
 {
@@ -16,12 +20,6 @@ abstract class AbstractModel extends Model
 
     const TABLE = null;
 
-    /**
-     * @param string      $column
-     * @param string|null $alias
-     *
-     * @return string
-     */
     public static function column(string $column, string $alias = null): string
     {
         if (is_null($alias)) {
@@ -31,17 +29,11 @@ abstract class AbstractModel extends Model
         return sprintf('%s.%s AS %s', static::TABLE, $column, $alias);
     }
 
-    /**
-     * @return string
-     */
     public function getModelName(): string
     {
         return class_basename($this);
     }
 
-    /**
-     * @return AbstractRepository
-     */
     public static function repository(): AbstractRepository
     {
         return AbstractRepository::create(static::class);

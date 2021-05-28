@@ -8,14 +8,10 @@ namespace App\Models\Repositories;
  */
 abstract class AbstractRepository
 {
-    /**
-     * @param string $modelClass
-     *
-     * @return AbstractRepository
-     */
     public static function create(string $modelClass): AbstractRepository
     {
         $object = sprintf('App\Models\Repositories\%sRepository', class_basename($modelClass));
+
         return new $object();
     }
 }
