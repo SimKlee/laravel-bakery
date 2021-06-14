@@ -10,20 +10,23 @@ use SimKlee\LaravelBakery\Model\Column\ColumnParser;
 
 /**
  * Class ModelDefinition
+ *
  * @package SimKlee\LaravelBakery\Model
  */
 class ModelDefinition
 {
-    public string      $model;
-    public bool        $timestamps     = false;
-    public bool        $timeRestricted = false;
-    public array       $values         = [];
-    public string      $table;
-    private Collection $columnBag;
+    public string            $model;
+    public bool              $timestamps     = false;
+    public bool              $timeRestricted = false;
+    public array             $values         = [];
+    public string            $table;
+    private Collection       $columnBag;
+    public ModelRelationsBag $relationBag;
 
     public function __construct()
     {
-        $this->columnBag = new Collection();
+        $this->columnBag   = new Collection();
+        $this->relationBag = new ModelRelationsBag();
     }
 
     /**

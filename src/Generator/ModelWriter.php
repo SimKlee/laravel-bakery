@@ -7,6 +7,7 @@ use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ClassConstantsStrings;
 use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ClassPropertyStrings;
 use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ModelCasts;
 use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ModelDates;
+use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ModelRelations;
 use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ModelValueConstants;
 use SimKlee\LaravelBakery\Model\ModelDefinition;
 use SimKlee\LaravelBakery\Support\ClassHelper;
@@ -47,6 +48,7 @@ class ModelWriter extends AbstractWriter
         $this->setVar('casts', (new ModelCasts($this->modelDefinition))->toString());
         $this->setVar('dates', (new ModelDates($this->modelDefinition))->toString());
         $this->setVar('valueConstants', (new ModelValueConstants($this->modelDefinition))->toString());
+        $this->setVar('relations', (new ModelRelations($this->modelDefinition))->toString());
     }
 
     private function getClassUses(): string

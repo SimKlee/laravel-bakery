@@ -55,4 +55,6 @@ class {{ Model }} extends {{ extends }}
     protected $casts = [
 {{ casts }}
     ];
+
+{{ relations }}
 }

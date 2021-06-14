@@ -62,17 +62,26 @@ class ModelDefinitionsBag
 
                     // @TODO: what if not?
                     if ($pk instanceof Column) {
-                        $column->dataType    = $pk->dataType;
-                        $column->phpDataType = $pk->phpDataType;
-                        $column->unsigned    = $pk->unsigned;
-                        $column->length      = $pk->length;
-                        $column->precision   = $pk->precision;
-                        $column->index       = true;
-
-                        $column->foreignKeyColumn = $pk;
+                        $this->syncColumns($column, $pk);
                     }
+
+                    // set model relations
+                    
+
                 });
         });
+    }
+
+    private function syncColumns(Column $column, Column $pk): void
+    {
+        $column->dataType    = $pk->dataType;
+        $column->phpDataType = $pk->phpDataType;
+        $column->unsigned    = $pk->unsigned;
+        $column->length      = $pk->length;
+        $column->precision   = $pk->precision;
+        $column->index       = true;
+
+        $column->foreignKeyColumn = $pk;
     }
 
     /**
