@@ -14,7 +14,7 @@ namespace App\Models;
  */
 class {{ Model }} extends {{ extends }}
 {
-    const TABLE = '{{ table }}';
+    public const TABLE = '{{ table }}';
 
 {{ constants }}
 

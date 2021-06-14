@@ -8,16 +8,9 @@ namespace SimKlee\LaravelBakery\Generator;
  */
 interface GeneratorInterface
 {
-    /**
-     * @param string $key
-     * @param mixed  $value
-     */
-    public function setVar(string $key, $value): void;
+    public function setVar(string $key, $value): Stub;
 
     /**
-     * @param string $file
-     * @param bool   $override
-     *
      * @return bool|int
      */
     public function write(string $file, bool $override = false);

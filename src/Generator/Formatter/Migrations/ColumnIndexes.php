@@ -4,7 +4,7 @@ namespace SimKlee\LaravelBakery\Generator\Formatter\ColumnHelper;
 
 use SimKlee\LaravelBakery\Generator\Formatter\AbstractFormatter;
 use SimKlee\LaravelBakery\Generator\Stub;
-use SimKlee\LaravelBakery\Models\Column;
+use SimKlee\LaravelBakery\Model\Column\Column;
 
 /**
  * Class ColumnIndexes

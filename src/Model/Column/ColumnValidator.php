@@ -59,7 +59,7 @@ class ColumnValidator
 
         return $this->errors->filter(function (AbstractValidator $validator) {
                 return $validator->getError()->level === AbstractValidator::LEVEL_ERROR;
-            })->count() > 0;
+            })->count() === 0;
     }
 
     /**

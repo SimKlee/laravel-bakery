@@ -112,9 +112,6 @@ class ModelDefinitionsBag
         return $this->modelDefinitionBag;
     }
 
-    /**
-     * @return ModelDefinition
-     */
     public function getModelDefinition(string $model): ModelDefinition
     {
         return $this->modelDefinitionBag->filter(function (ModelDefinition $modelDefinition) use ($model) {

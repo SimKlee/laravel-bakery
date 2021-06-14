@@ -42,11 +42,13 @@ abstract class AbstractColumnComponent implements ColumnPipeline
      * @return mixed
      * @throws ColumnComponentValidationException
      */
-    public function handle(Column $column, Closure $next)
+    public function handle(Column $column, Closure $next = null)
     {
         $this->parseDefinitions();
 
-        return $next($column);
+        if ($next) {
+            return $next($column);
+        }
     }
 
     /**

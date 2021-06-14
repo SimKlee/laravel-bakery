@@ -16,7 +16,7 @@ abstract class AbstractValidator
     const LEVEL_WARNING = 'warning';
 
     protected Column                $column;
-    protected ?ColumnValidatorError $error;
+    protected ?ColumnValidatorError $error = null;
 
     /**
      * AbstractValidator constructor.

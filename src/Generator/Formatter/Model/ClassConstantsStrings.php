@@ -4,6 +4,7 @@ namespace SimKlee\LaravelBakery\Generator\Formatter\Migrations;
 
 use SimKlee\LaravelBakery\Generator\Formatter\AbstractFormatter;
 use SimKlee\LaravelBakery\Model\Column\Column;
+use Str;
 
 /**
  * Class ClassConstantsStrings
@@ -14,7 +15,7 @@ class ClassConstantsStrings extends AbstractFormatter
     public function toString(): string
     {
         return $this->modelDefinition->getColumns()->map(function (Column $column) {
-            return sprintf('    const PROPERTY_%s = \'%s\';', $column->getPropertyString(), $column->name);
+            return sprintf('    public const PROPERTY_%s = \'%s\';', Str::upper($column->name), $column->name);
         })->implode(PHP_EOL);
     }
 

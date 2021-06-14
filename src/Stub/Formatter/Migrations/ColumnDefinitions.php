@@ -3,8 +3,7 @@
 namespace SimKlee\LaravelBakery\Stub\Formatter\Migrations;
 
 use Illuminate\Support\Collection;
-use SimKlee\LaravelBakery\Database\Migration\ColumnHelper;
-use SimKlee\LaravelBakery\Models\Column;
+use SimKlee\LaravelBakery\Model\Column\Column;
 use SimKlee\LaravelBakery\Stub\Formatter\AbstractFormatter;
 use SimKlee\LaravelBakery\Stub\Stub;
 
@@ -75,7 +74,8 @@ class ColumnDefinitions extends AbstractFormatter
     private function getMethod(Column $column): string
     {
         if (!isset($this->methodMap[ $column->dataType ])) {
-            throw new \Exception('Unknown method for data type ' . $column->dataType);
+            dump($column);
+            throw new \Exception(sprintf('Unknown method for data type "%s"', $column->dataType));
         }
 
         return ($column->unsigned)

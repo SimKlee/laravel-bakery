@@ -4,7 +4,7 @@ namespace SimKlee\LaravelBakery\Generator;
 
 use SimKlee\LaravelBakery\Generator\Formatter\ColumnHelper\ColumnIndexes;
 use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ForeignKeys;
-use SimKlee\LaravelBakery\Stub\Formatter\Migrations\ColumnDefinitions;
+use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ColumnDefinitions;
 use Str;
 
 /**

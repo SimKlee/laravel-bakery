@@ -8,7 +8,7 @@ use SimKlee\LaravelBakery\Model\ModelDefinition;
  * Class AbstractWriter
  * @package SimKlee\LaravelBakery\Generator
  */
-abstract class AbstractWriter implements GeneratorInterface
+abstract class AbstractWriter
 {
     protected string          $stubFile = '';
     protected Stub            $stub;

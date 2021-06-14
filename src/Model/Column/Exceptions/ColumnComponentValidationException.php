@@ -3,7 +3,7 @@
 namespace SimKlee\LaravelBakery\Model\Column\Exceptions;
 
 use Illuminate\Support\Collection;
-use SimKlee\LaravelBakery\Model\Column\ColumnValidatorError;
+use SimKlee\LaravelBakery\Model\Column\Validators\ColumnValidatorError;
 
 /**
  * Class ColumnComponentValidationException
@@ -19,7 +19,7 @@ class ColumnComponentValidationException extends \Exception
     public function __toString()
     {
         return $this->errors->map(function (ColumnValidatorError $error) {
-            return sprintf('[%s] %s', $error->code, $error->message);
+            return sprintf('[%s] %s', $error->level, $error->message);
         })->implode(PHP_EOL);
     }
 }

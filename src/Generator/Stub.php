@@ -11,10 +11,10 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
  */
 class Stub implements GeneratorInterface
 {
-    protected string $stub;
-    protected string $path = __DIR__ . '/../../resources/stubs/';
-    protected string $content;
-    protected array  $vars;
+    protected ?string $stub    = null;
+    protected string  $path    = __DIR__ . '/../../resources/stubs/';
+    protected ?string $content = '';
+    protected ?array  $vars    = null;
 
     public function __construct(string $stub, string $path = null)
     {
@@ -30,6 +30,9 @@ class Stub implements GeneratorInterface
     {
         try {
             $this->content = File::get($this->path . $this->stub);
+            if (substr($this->content, -1) === PHP_EOL) {
+                $this->content = substr($this->content, 0, -1);
+            }
 
             return true;
         } catch (FileNotFoundException $e) {

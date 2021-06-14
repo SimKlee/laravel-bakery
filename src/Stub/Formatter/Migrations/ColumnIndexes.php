@@ -2,7 +2,6 @@
 
 namespace SimKlee\LaravelBakery\Stub\Formatter\ColumnHelper;
 
-use SimKlee\LaravelBakery\Database\Migration\ColumnHelper;
 use SimKlee\LaravelBakery\Models\Column;
 use SimKlee\LaravelBakery\Stub\Formatter\AbstractFormatter;
 

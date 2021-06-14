@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use SimKlee\LaravelBakery\Generator\Formatter\AbstractFormatter;
 use SimKlee\LaravelBakery\Generator\Stub;
 use SimKlee\LaravelBakery\Model\Column\Exceptions\UnknownMethodForDataTypeException;
-use SimKlee\LaravelBakery\Models\Column;
+use SimKlee\LaravelBakery\Model\Column\Column;
 
 /**
  * Class ColumnDefinitions
@@ -43,7 +43,7 @@ class ColumnDefinitions extends AbstractFormatter
      */
     private function getColumnMigration(Column $column): string
     {
-        $stub = new Stub('column_definition.stub');
+        $stub = new Stub('migrations/column_definition.stub');
         $stub->setVar('method', $this->getMethod($column))
              ->setVar('params', $this->getMethodParams($column))
              ->setVar('attributeMethods', $this->getAttributeMethods($column));
@@ -57,7 +57,7 @@ class ColumnDefinitions extends AbstractFormatter
     private function getMethod(Column $column): string
     {
         if (!isset($this->methodMap[ $column->dataType ])) {
-            throw new UnknownMethodForDataTypeException('Unknown method for data type ' . $column->dataType);
+            throw new UnknownMethodForDataTypeException(sprintf('Unknown method for data type "%s"', $column->dataType));
         }
 
         return ($column->unsigned)

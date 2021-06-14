@@ -10,26 +10,26 @@ use SimKlee\LaravelBakery\Support\Collection;
  */
 class Column
 {
-    public ?string $model;
-    public ?string $name;
-    public ?string $dataType;
-    public ?string $phpDataType;
+    public ?string $model         = null;
+    public ?string $name          = null;
+    public ?string $dataType      = null;
+    public ?string $phpDataType   = null;
     public bool    $unsigned      = false;
     public bool    $primaryKey    = false;
     public bool    $autoIncrement = false;
     public bool    $nullable      = false;
-    public ?int    $length;
-    public ?int    $precision;
+    public ?int    $length        = null;
+    public ?int    $precision     = null;
     public bool    $index         = false;
     public bool    $unique        = false;
     public bool    $label         = false;
     public array   $values        = [];
     /** @var mixed */
-    public             $default;
-    public bool        $foreignKey         = false;
-    public ?Column     $foreignKeyColumn;
-    public ?string     $foreignKeyOnUpdate = null;
-    public ?string     $foreignKeyOnDelete = null;
+    public            $default;
+    public bool       $foreignKey         = false;
+    public ?Column    $foreignKeyColumn   = null;
+    public ?string    $foreignKeyOnUpdate = null;
+    public ?string    $foreignKeyOnDelete = null;
     public Collection $definitions;
 
     /**

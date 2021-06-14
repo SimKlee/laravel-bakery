@@ -4,6 +4,7 @@ namespace SimKlee\LaravelBakery\Model;
 
 use Illuminate\Support\Str;
 use SimKlee\LaravelBakery\Model\Column\Column;
+use SimKlee\LaravelBakery\Model\Column\Exceptions\ColumnComponentValidationException;
 use SimKlee\LaravelBakery\Support\Collection;
 use SimKlee\LaravelBakery\Model\Column\ColumnParser;
 
@@ -14,8 +15,9 @@ use SimKlee\LaravelBakery\Model\Column\ColumnParser;
 class ModelDefinition
 {
     public string      $model;
-    public bool        $timestamps = false;
-    public array       $values     = [];
+    public bool        $timestamps     = false;
+    public bool        $timeRestricted = false;
+    public array       $values         = [];
     public string      $table;
     private Collection $columnBag;
 
@@ -28,6 +30,7 @@ class ModelDefinition
      * @param string $model
      *
      * @return ModelDefinition
+     * @throws ColumnComponentValidationException
      */
     public static function fromConfig(string $model): ModelDefinition
     {
@@ -53,22 +56,19 @@ class ModelDefinition
     }
 
     /**
-     * @param array $definitions
+     * @throws ColumnComponentValidationException
      */
     public function addColumnDefinitions(array $definitions): void
     {
         collect($definitions)->each(function (string $columnDefinition, string $name) {
             $column = ColumnParser::parse($this->model, $name, $columnDefinition);
-            if (isset($this->values[$name])) {
-                $column->values = $this->values[$name];
+            if (isset($this->values[ $name ])) {
+                $column->values = $this->values[ $name ];
             }
             $this->addColumn($column);
         });
     }
 
-    /**
-     * @param Column $column
-     */
     public function addColumn(Column $column): void
     {
         $this->columnBag->add($column);
@@ -100,11 +100,6 @@ class ModelDefinition
         return false;
     }
 
-    /**
-     * @param bool $snake
-     *
-     * @return string
-     */
     public function getModel(bool $snake = false): string
     {
         if ($snake) {
@@ -114,25 +109,16 @@ class ModelDefinition
         return $this->model;
     }
 
-    /**
-     * @return string
-     */
     public function getTable(): string
     {
         return $this->table;
     }
 
-    /**
-     * @return bool
-     */
     public function hasTimestamps(): bool
     {
         return $this->timestamps;
     }
 
-    /**
-     * @return bool
-     */
     public function usesCarbon(): bool
     {
         return $this->columnBag->filter(function (Column $column) {

@@ -4,12 +4,10 @@ namespace SimKlee\LaravelBakery\Console\Commands;
 
 use File;
 use Illuminate\Support\Carbon;
-use SimKlee\LaravelBakery\Generator\AbstractWriter;
 use SimKlee\LaravelBakery\Generator\MigrationWriter;
 use SimKlee\LaravelBakery\Generator\ModelFactoryWriter;
 use SimKlee\LaravelBakery\Generator\ModelRepositoryWriter;
 use SimKlee\LaravelBakery\Generator\ModelWriter;
-use SimKlee\LaravelBakery\Model\Exceptions\WrongForeignKeyDefinitionException;
 use Str;
 
 /**

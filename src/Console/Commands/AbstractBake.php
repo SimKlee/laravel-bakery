@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use SimKlee\LaravelBakery\File\ConsoleFileHelper;
 use SimKlee\LaravelBakery\Generator\AbstractWriter;
+use SimKlee\LaravelBakery\Model\Column\Exceptions\ColumnComponentValidationException;
 use SimKlee\LaravelBakery\Model\ModelDefinitionsBag;
 
 /**
@@ -20,10 +21,10 @@ abstract class AbstractBake extends Command
     protected const OPTION_FORCE   = 'force';
     protected const OPTION_CONFIG  = 'config';
 
-    protected ConsoleFileHelper   $fileHelper;
-    protected string              $configFile    = 'models.php';
-    protected array               $configuration = [];
-    protected ModelDefinitionsBag $modelDefinitionsBag;
+    protected ?ConsoleFileHelper   $fileHelper          = null;
+    protected string               $configFile          = 'models.php';
+    protected array                $configuration       = [];
+    protected ?ModelDefinitionsBag $modelDefinitionsBag = null;
 
     /**
      * BakeModelCommand constructor.
@@ -31,7 +32,7 @@ abstract class AbstractBake extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->fileHelper = new ConsoleFileHelper($this);
+        $this->fileHelper          = new ConsoleFileHelper($this);
     }
 
     /**
@@ -70,8 +71,16 @@ abstract class AbstractBake extends Command
 
     protected function loadConfiguration(): void
     {
-        $this->configuration       = config(substr($this->configFile, 0, -4));
-        $this->modelDefinitionsBag = ModelDefinitionsBag::fromConfig($this->configuration);
+        $this->configuration = config(substr($this->configFile, 0, -4));
+        try {
+            $this->modelDefinitionsBag = ModelDefinitionsBag::fromConfig($this->configuration);
+        } catch (ColumnComponentValidationException $e) {
+            $this->error($e->getMessage());
+            $e->errors->each(function (string $message) {
+                $this->error($message);
+            });
+            throw $e;
+        }
     }
 
     protected function override(string $type, string $file): bool
@@ -133,7 +142,6 @@ abstract class AbstractBake extends Command
         if ($this->option(self::OPTION_ALL)) {
             return $this->handleAll();
         }
-
 
 
         $model = $this->argument(self::ARGUMENT_MODEL);

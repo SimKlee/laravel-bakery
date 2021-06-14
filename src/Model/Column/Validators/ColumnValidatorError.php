@@ -8,8 +8,8 @@ namespace SimKlee\LaravelBakery\Model\Column\Validators;
  */
 class ColumnValidatorError
 {
-    public string $level;
-    public string $message;
+    public ?string $level   = null;
+    public ?string $message = null;
 
     /**
      * ColumnValidatorError constructor.

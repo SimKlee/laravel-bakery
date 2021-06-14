@@ -77,12 +77,16 @@ class ColumnDataType extends AbstractColumnComponent
     {
         $dataType = $this->column->definitions->get(0);
 
-        if (!isset($this->phpDataTypes[ $dataType ])) {
-            throw new UnknownDataTypeException(sprintf('No php data type defined for "%s"', $dataType));
+        if ($dataType === 'fk') {
+            return;
         }
 
         if (isset($this->dataTypeAliases[ $dataType ])) {
             $dataType = $this->dataTypeAliases[ $dataType ];
+        }
+
+        if (!isset($this->phpDataTypes[ $dataType ])) {
+            throw new UnknownDataTypeException(sprintf('No php data type defined for "%s"', $dataType));
         }
 
         $this->column->dataType    = $dataType;
