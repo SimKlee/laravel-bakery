@@ -68,7 +68,7 @@ class BakeModel extends AbstractBake
         $this->write(
             new MigrationWriter($modelDefinition),
             base_path(
-                sprintf('database/migrations/%s_create_%s_table.php', $timestamp->format('Y_m_d_His'), Str::plural(Str::snake($model)))
+                sprintf('database/migrations/%s_create_%s_table.php', $timestamp->format('Y_m_d_His'), Str::snake($model))
             ),
             'model migration'
         );

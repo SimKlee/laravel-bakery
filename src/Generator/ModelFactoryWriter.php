@@ -3,6 +3,7 @@
 namespace SimKlee\LaravelBakery\Generator;
 
 use SimKlee\LaravelBakery\Model\Column\Column;
+use SimKlee\LaravelBakery\Model\Column\ColumnDataType;
 use SimKlee\LaravelBakery\Model\Column\ColumnValidationRule;
 
 /**
@@ -27,7 +28,7 @@ class ModelFactoryWriter extends AbstractWriter
                 return $column->primaryKey === false;
             })
             ->map(function (Column $column) {
-                return sprintf("\t\t\t%s => null,", $column->getPropertyString());
+                return sprintf("\t\t\t%s => null, // %s", $column->getPropertyString(), $column->definitions->implode('|'));
             })
             ->implode(PHP_EOL);
     }

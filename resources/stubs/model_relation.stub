@@ -1,0 +1,4 @@
+    public function {{ name }}(): {{ Type }}
+    {
+        return $this->{{ type }}({{ Model }}::class);
+    }

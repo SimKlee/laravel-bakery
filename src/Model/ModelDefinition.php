@@ -4,6 +4,7 @@ namespace SimKlee\LaravelBakery\Model;
 
 use Illuminate\Support\Str;
 use SimKlee\LaravelBakery\Model\Column\Column;
+use SimKlee\LaravelBakery\Model\Column\ColumnDataType;
 use SimKlee\LaravelBakery\Model\Column\Exceptions\ColumnComponentValidationException;
 use SimKlee\LaravelBakery\Support\Collection;
 use SimKlee\LaravelBakery\Model\Column\ColumnParser;
@@ -15,18 +16,19 @@ use SimKlee\LaravelBakery\Model\Column\ColumnParser;
  */
 class ModelDefinition
 {
-    public string            $model;
-    public bool              $timestamps     = false;
-    public bool              $timeRestricted = false;
-    public array             $values         = [];
-    public string            $table;
-    private Collection       $columnBag;
-    public ModelRelationsBag $relationBag;
+    public string      $model;
+    public bool        $timestamps     = false;
+    public bool        $timeRestricted = false;
+    public array       $values         = [];
+    public string      $table;
+    public ?string     $label          = null;
+    private Collection $columnBag;
+    public Collection  $relations;
 
     public function __construct()
     {
-        $this->columnBag   = new Collection();
-        $this->relationBag = new ModelRelationsBag();
+        $this->columnBag = new Collection();
+        $this->relations = new Collection();
     }
 
     /**
@@ -51,6 +53,10 @@ class ModelDefinition
 
         if (isset($config['values'])) {
             $instance->values = $config['values'];
+        }
+
+        if (isset($config['label']) && $config['label'] !== false) {
+            $instance->label = $config['label'];
         }
 
         $instance->addColumnDefinitions($config['columns']);
@@ -122,10 +128,26 @@ class ModelDefinition
         return $this->timestamps;
     }
 
+    public function hasDates(): bool
+    {
+        return $this->columnBag->filter(function (Column $column) {
+                return $column->phpDataType === ColumnDataType::PHP_DATA_TYPE_CARBON;
+            })->count() > 0;
+    }
+
     public function usesCarbon(): bool
     {
         return $this->columnBag->filter(function (Column $column) {
                 return $column->phpDataType === 'Carbon';
             })->count() > 0;
+    }
+
+    public function addRelation(ModelRelation $relation): void
+    {
+        if ($relation->model === $this->model) {
+            $this->relations->add(new ModelRelation($this->model, 'belongsTo', $relation->targetModel));
+        } else if ($relation->targetModel === $this->model) {
+            $this->relations->add(new ModelRelation($this->model, 'hasMany', $relation->model));
+        }
     }
 }

@@ -11,26 +11,32 @@ use Illuminate\Support\Collection;
  */
 class ModelRelationsBag
 {
-    private Collection $relations;
-
-    public function __construct()
-    {
-        $this->relations = new Collection();
-    }
+    private array $relations = [];
 
     public function add(ModelRelation $relation): void
     {
-        $this->relations->add($relation);
+        if (!isset($this->relations[ $relation->model ])) {
+            $this->relations[ $relation->model ] = [];
+        }
+
+        if (!isset($this->relations[ $relation->targetModel ])) {
+            $this->relations[ $relation->targetModel ] = [];
+        }
+
+        $this->relations[ $relation->model ][]       = $relation;
+        $this->relations[ $relation->targetModel ][] = $relation;
     }
 
-    public function getRelations(string $model = null): Collection
+    public function getRelations(string $model = null): array
     {
-        if (is_null($model))  {
+        if (is_null($model)) {
             return $this->relations;
         }
 
-        return $this->relations->filter(function (ModelRelation $relation) use ($model) {
-            return in_array($model, [$relation->model, $relation->targetModel]);
-        });
+        if (isset($this->relations[ $model ])) {
+            return $this->relations[ $model ];
+        }
+
+        return [];
     }
 }

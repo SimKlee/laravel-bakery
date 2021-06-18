@@ -53,6 +53,8 @@ class Stub implements GeneratorInterface
             $this->replace($key, $value);
         }
 
+        $this->content = str_replace(PHP_EOL . PHP_EOL . PHP_EOL, PHP_EOL, $this->content);
+
         return $this->content;
     }
 

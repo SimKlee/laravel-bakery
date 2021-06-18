@@ -13,7 +13,8 @@ use SimKlee\LaravelBakery\Support\Collection as BakeryCollection;
  */
 class ModelDefinitionsBag
 {
-    private Collection $modelDefinitionBag;
+    private Collection        $modelDefinitionBag;
+    private ModelRelationsBag $modelRelationsBag;
 
     /**
      * ModelDefinitionsBag constructor.
@@ -21,6 +22,7 @@ class ModelDefinitionsBag
     public function __construct()
     {
         $this->modelDefinitionBag = new Collection();
+        $this->modelRelationsBag  = new ModelRelationsBag();
     }
 
     /**
@@ -63,13 +65,19 @@ class ModelDefinitionsBag
                     // @TODO: what if not?
                     if ($pk instanceof Column) {
                         $this->syncColumns($column, $pk);
+                        $this->modelRelationsBag->add(
+                            new ModelRelation($column->model, ModelRelation::TYPE_ONE_TO_MANY, $pk->model)
+                        );
                     }
-
-                    // set model relations
-                    
-
                 });
         });
+
+        $this->modelDefinitionBag->each(function (ModelDefinition $modelDefinition) {
+            collect($this->modelRelationsBag->getRelations($modelDefinition->model))->each(function (ModelRelation $modelRelation) use ($modelDefinition) {
+                $modelDefinition->addRelation($modelRelation);
+            });
+        });
+
     }
 
     private function syncColumns(Column $column, Column $pk): void

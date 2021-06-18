@@ -1,0 +1,13 @@
+    /**
+     * @return Collection
+     */
+    public function lookup(): Collection
+    {
+        return DB::table({{ Model }}::TABLE)
+                ->select([
+                    {{ Model }}::column({{ Model }}::PROPERTY_ID, 'value'),
+                    {{ Model }}::column({{ Model }}::PROPERTY_{{ LabelColumn }}, 'label'),
+                ])
+                ->orderBy({{ Model }}::column({{ Model }}::PROPERTY_{{ LabelColumn }}))
+                ->get();
+    }

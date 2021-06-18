@@ -36,6 +36,8 @@ class ModelDefinition
      */
     private $values = [];
 
+    private ?string $label = null;
+
     /**
      * ModelDefinition constructor.
      *
@@ -67,6 +69,10 @@ class ModelDefinition
 
         if (isset($config['values'])) {
             $instance->setValues($config['values']);
+        }
+
+        if (isset($config['label'])) {
+            $instance->setLabel($config['label']);
         }
 
         return $instance;
@@ -171,5 +177,15 @@ class ModelDefinition
     public function getValues(): array
     {
         return $this->values;
+    }
+
+    public function getLabel(): ?string
+    {
+        return $this->label;
+    }
+
+    public function setLabel(string $label): void
+    {
+        $this->label = $label;
     }
 }

@@ -45,6 +45,8 @@ abstract class AbstractBake extends Command
             $controllerPublished = (int) class_exists('\\App\\Http\\Controllers\\' . $model . 'Controller');
 
             return [$i, $model, $modelPublished, $controllerPublished];
+        })->sortBy(function (array $data) {
+            return $data[1];
         })->toArray();
     }
 
@@ -134,6 +136,9 @@ abstract class AbstractBake extends Command
         return 0;
     }
 
+    /**
+     * @throws ColumnComponentValidationException
+     */
     public function handle(): int
     {
         $this->handleConfig();

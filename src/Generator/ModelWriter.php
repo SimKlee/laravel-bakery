@@ -3,13 +3,14 @@
 namespace SimKlee\LaravelBakery\Generator;
 
 use Illuminate\Support\Collection;
-use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ClassConstantsStrings;
-use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ClassPropertyStrings;
-use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ModelCasts;
-use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ModelDates;
-use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ModelRelations;
-use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ModelValueConstants;
+use SimKlee\LaravelBakery\Generator\Formatter\Model\ClassConstantsStrings;
+use SimKlee\LaravelBakery\Generator\Formatter\Model\ClassPropertyStrings;
+use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelCasts;
+use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelDates;
+use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelRelations;
+use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelValueConstants;
 use SimKlee\LaravelBakery\Model\ModelDefinition;
+use SimKlee\LaravelBakery\Model\ModelRelation;
 use SimKlee\LaravelBakery\Support\ClassHelper;
 
 /**
@@ -37,6 +38,18 @@ class ModelWriter extends AbstractWriter
         $extends = config('laravel-bakery.model.base_model');
         $this->uses->add($extends);
 
+        // add uses for model relations
+        $this->modelDefinition->relations->each(function (ModelRelation $modelRelation) {
+            if ($modelRelation->type === ModelRelation::TYPE_HAS_MANY) {
+                $this->uses->add('Illuminate\\Support\\Collection');
+            }
+            $this->uses->add('Illuminate\\Database\\Eloquent\\Relations\\' . ucfirst($modelRelation->type));
+        });
+
+        if ($this->modelDefinition->hasDates()) {
+            $this->uses->add('Carbon\\Carbon');
+        }
+
         $this->setVar('Model', $this->modelDefinition->getModel());
         $this->setVar('table', $this->modelDefinition->getTable());
         $this->setVar('extends', class_basename($extends));
@@ -55,6 +68,7 @@ class ModelWriter extends AbstractWriter
     {
         $string = $this->uses
             ->unique()
+            ->sort()
             ->filter(function (string $class) {
                 return !ClassHelper::inNamespace($class, 'App\Models');
             })

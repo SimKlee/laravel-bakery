@@ -22,22 +22,5 @@ class {{ Model }}Repository extends AbstractRepository
         return {{ Model }}::all();
     }
 
-    /**
-     * @return Collection
-     */
-    public function lookup(): Collection
-    {
-        /*
-        // @TODO
-        return DB::table({{ Model }}::TABLE)
-            ->select([
-                {{ Model }}::column({{ Model }}::PROPERTY_ID, 'value'),
-                {{ Model }}::column({{ Model }}::PROPERTY_NAME, 'label'),
-            ])
-            ->orderBy({{ Model }}::column({{ Model }}::PROPERTY_NAME))
-            ->get();
-         */
-
-        return collect();
-    }
+{{ lookupMethod }}
 }
