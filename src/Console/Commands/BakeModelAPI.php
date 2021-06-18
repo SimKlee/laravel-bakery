@@ -69,7 +69,6 @@ class BakeModelAPI extends AbstractBake
             return 1;
         }
 
-
         $this->addResourceRoute($model);
 
         return 0;

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\{{ Model }}Resource;
 use App\Models\{{ Model }};
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 /**
  * Class {{ Model }}Controller
@@ -17,61 +18,49 @@ class {{ Model }}Controller extends Controller
     /**
      * [GET|HEAD] api/{{ models }} [api.{{ models }}.index]
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $query = {{ Model }}::query()->select({{ Model }}::column('*'));
-
-        return response()->json($query->get());
+        return {{ Model }}Resource::collection({{ Model }}::all());
     }
 
     /**
      * [POST] api/{{ models }} [api.{{ models }}.store]
      */
-    public function store()
+    public function store(Request $request): {{ Model }}Resource
     {
+        ${{ model }} = {{ Model }}::create([
+            // @TODO
+        ]);
 
-    }
-
-    /**
-     * [GET|HEAD] api/{{ models }}/create [api.{{ models }}.create]
-     */
-    public function create()
-    {
-
+        return new {{ Model }}Resource(${{ model }});
     }
 
     /**
      * [GET|HEAD] api/{{ models }}/{{{ model }}} [api.{{ models }}.show]
      */
-    public function show(Request $request, int ${{ model }}): JsonResponse
+    public function show({{ Model }} ${{ model }}): {{ Model }}Resource
     {
-        $item       = {{ Model }}::find(${{ model }});
-        $statusCode = $item ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
-
-        return response()->json($item, $statusCode);
+        return new {{ Model }}Resource(${{ model }});
     }
 
     /**
      * [PUT|PATCH] api/{{ models }}/{{{ model }}} [{{ models }}.update]
      */
-    public function update(Request $request, int ${{ model }})
+    public function update(Request $request, {{ Model }} ${{ model }}): {{ Model }}Resource
     {
+        // @TODO: check if all fields should be accessed
+        ${{ model }}->update($request->all());
 
+        return new {{ Model }}Resource(${{ model }});
     }
 
     /**
      * [DELETE] api/{{ models }}/{{{ model }}} [{{ models }}.destroy]
      */
-    public function destroy(Request $request, int ${{ model }})
+    public function destroy({{ Model }} ${{ model }}): JsonResponse
     {
+        ${{ model }}->delete();
 
-    }
-
-    /**
-     * [GET|HEAD] api/{{ models }}/{{{ model }}} [{{ models }}.show]
-     */
-    public function edit(Request $request, int ${{ model }})
-    {
-
+        return response()->json(null, 204);
     }
 }
