@@ -169,28 +169,6 @@ class BakeModelCommand extends AbstractBakeCommand
     }
 
     /**
-     * @return int
-     */
-    private function createSample(): int
-    {
-        $file = config_path($this->configFile);
-
-        try {
-            if ($this->fileHelper->put($file, File::get(ConsoleFileHelper::getResourcePath('config_sample.stub')))) {
-                $this->info(sprintf('Written config sample into "%s" successfully.', $file));
-            } else {
-                $this->warn(sprintf('Skipped writing config sample into "%s".', $file));
-            }
-        } catch (FileNotFoundException $e) {
-            $this->error($e->getMessage());
-
-            return 1;
-        }
-
-        return 0;
-    }
-
-    /**
      * @param string $model
      *
      * @return bool

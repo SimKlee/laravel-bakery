@@ -26,6 +26,7 @@ class ColumnDataType extends AbstractColumnComponent
     const DATA_TYPE_DATE           = 'date';
     const DATA_TYPE_TIME           = 'time';
     const DATA_TYPE_TIMESTAMP      = 'timestamp';
+    const DATA_TYPE_UUID           = 'uuid';
 
     const PHP_DATA_TYPE_INTEGER = 'int';
     const PHP_DATA_TYPE_STRING  = 'string';
@@ -49,6 +50,7 @@ class ColumnDataType extends AbstractColumnComponent
         self::DATA_TYPE_DATE           => self::PHP_DATA_TYPE_CARBON,
         self::DATA_TYPE_TIME           => self::PHP_DATA_TYPE_CARBON,
         self::DATA_TYPE_TIMESTAMP      => self::PHP_DATA_TYPE_CARBON,
+        self::DATA_TYPE_UUID           => self::PHP_DATA_TYPE_STRING,
     ];
 
     private array $dataTypeAliases = [

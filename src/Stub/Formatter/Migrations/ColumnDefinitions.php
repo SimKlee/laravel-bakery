@@ -25,7 +25,8 @@ class ColumnDefinitions extends AbstractFormatter
         'timestamp'     => 'timestamp',
         'boolean'       => 'boolean',
         'decimal'       => 'decimal',
-        'dateTime'       => 'dateTime',
+        'dateTime'      => 'dateTime',
+        'uuid'          => 'uuid',
     ];
 
     /**
@@ -50,8 +51,8 @@ class ColumnDefinitions extends AbstractFormatter
     {
         $stub = new Stub('column_definition.stub');
         $stub->replace('method', $this->getMethod($column))
-            ->replace('params', $this->getMethodParams($column))
-            ->replace('attributeMethods', $this->getAttributeMethods($column));
+             ->replace('params', $this->getMethodParams($column))
+             ->replace('attributeMethods', $this->getAttributeMethods($column));
 
         #return $stub->getContent();
 

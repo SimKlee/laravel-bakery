@@ -22,7 +22,7 @@ class {{ Model }}Resource extends JsonResource
         /** @var {{ Model }} $this */
 
         return [
-            {{ data }}
+{{ data }}
         ];
     }
 }

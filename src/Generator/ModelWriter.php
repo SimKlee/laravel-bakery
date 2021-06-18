@@ -8,6 +8,7 @@ use SimKlee\LaravelBakery\Generator\Formatter\Model\ClassPropertyStrings;
 use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelCasts;
 use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelDates;
 use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelRelations;
+use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelTraits;
 use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelValueConstants;
 use SimKlee\LaravelBakery\Model\ModelDefinition;
 use SimKlee\LaravelBakery\Model\ModelRelation;
@@ -36,6 +37,26 @@ class ModelWriter extends AbstractWriter
     protected function handleVars(): void
     {
         $extends = config('laravel-bakery.model.base_model');
+        $this->setClassUses($extends);
+
+        $this->setVar('Model', $this->modelDefinition->getModel());
+        $this->setVar('table', $this->modelDefinition->getTable());
+        $this->setVar('extends', class_basename($extends));
+        $this->setVar('timestamps', $this->modelDefinition->hasTimestamps() ? 'true' : 'false');
+        $this->setVar('uses', $this->getClassUses());
+        $this->setVar('traits', (new ModelTraits($this->modelDefinition))->toString());
+        $this->setVar('guarded', $this->getGuarded());
+        $this->setVar('properties', (new ClassPropertyStrings($this->modelDefinition))->toString());
+        $this->setVar('constants', (new ClassConstantsStrings($this->modelDefinition))->toString());
+        $this->setVar('casts', (new ModelCasts($this->modelDefinition))->toString());
+        $this->setVar('dates', (new ModelDates($this->modelDefinition))->toString());
+        $this->setVar('valueConstants', (new ModelValueConstants($this->modelDefinition))->toString());
+        $this->setVar('relations', (new ModelRelations($this->modelDefinition))->toString());
+        $this->setVar('RouteKeyName', $this->modelDefinition->useUuid ? 'UUID' : 'ID');
+    }
+
+    private function setClassUses(string $extends): void
+    {
         $this->uses->add($extends);
 
         // add uses for model relations
@@ -50,18 +71,9 @@ class ModelWriter extends AbstractWriter
             $this->uses->add('Carbon\\Carbon');
         }
 
-        $this->setVar('Model', $this->modelDefinition->getModel());
-        $this->setVar('table', $this->modelDefinition->getTable());
-        $this->setVar('extends', class_basename($extends));
-        $this->setVar('timestamps', $this->modelDefinition->hasTimestamps() ? 'true' : 'false');
-        $this->setVar('uses', $this->getClassUses());
-        $this->setVar('guarded', $this->getGuarded());
-        $this->setVar('properties', (new ClassPropertyStrings($this->modelDefinition))->toString());
-        $this->setVar('constants', (new ClassConstantsStrings($this->modelDefinition))->toString());
-        $this->setVar('casts', (new ModelCasts($this->modelDefinition))->toString());
-        $this->setVar('dates', (new ModelDates($this->modelDefinition))->toString());
-        $this->setVar('valueConstants', (new ModelValueConstants($this->modelDefinition))->toString());
-        $this->setVar('relations', (new ModelRelations($this->modelDefinition))->toString());
+        if ($this->modelDefinition->useUuid) {
+            $this->uses->add('App\\Models\\Traits\\UuidTrait');
+        }
     }
 
     private function getClassUses(): string

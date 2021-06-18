@@ -27,6 +27,7 @@ class ColumnDefinitions extends AbstractFormatter
         'boolean'       => 'boolean',
         'decimal'       => 'decimal',
         'dateTime'      => 'dateTime',
+        'uuid'          => 'uuid',
     ];
 
     public function toString(): string

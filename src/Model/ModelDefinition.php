@@ -18,6 +18,7 @@ class ModelDefinition
 {
     public string      $model;
     public bool        $timestamps     = false;
+    public bool        $useUuid     = false;
     public bool        $timeRestricted = false;
     public array       $values         = [];
     public string      $table;
@@ -57,6 +58,10 @@ class ModelDefinition
 
         if (isset($config['label']) && $config['label'] !== false) {
             $instance->label = $config['label'];
+        }
+
+        if (isset($config['useUuid']) && $config['useUuid'] === true) {
+            $instance->useUuid = true;
         }
 
         $instance->addColumnDefinitions($config['columns']);
