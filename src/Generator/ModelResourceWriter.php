@@ -8,17 +8,15 @@ use SimKlee\LaravelBakery\Stub\Formatter\Migrations\ColumnDefinitions;
 use Str;
 
 /**
- * Class ApiControllerWriter
+ * Class ModelResourceWriter
  * @package SimKlee\LaravelBakery\Generator
  */
-class ApiControllerWriter extends AbstractWriter
+class ModelResourceWriter extends AbstractWriter
 {
-    protected string $stubFile = 'api_controller.stub';
+    protected string $stubFile = 'model_resource.stub';
 
     protected function handleVars(): void
     {
         $this->setVar('Model', $this->modelDefinition->getModel());
-        $this->setVar('model', $this->modelDefinition->getModel(true));
-        $this->setVar('models', Str::plural($this->modelDefinition->getModel(true)));
     }
 }

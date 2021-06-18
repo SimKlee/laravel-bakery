@@ -112,17 +112,18 @@ abstract class AbstractBake extends Command
         }
     }
 
-    protected function write(AbstractWriter $writer, string $file, string $type): void
+    protected function write(AbstractWriter $writer, string $file, string $type): bool
     {
         $written = $writer->write($file, $this->override($type, $file));
 
         if ($written !== false) {
             $this->info(sprintf('Generated %s "%s"', $type, $file));
 
-            return;
+            return true;
         }
 
         $this->error(sprintf('Generating %s "%s" failed!', $type, $file));
+        return false;
     }
 
     protected function handleAll(): int

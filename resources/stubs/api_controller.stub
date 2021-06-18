@@ -14,6 +14,9 @@ use Illuminate\Http\Response;
  */
 class {{ Model }}Controller extends Controller
 {
+    /**
+     * [GET|HEAD] api/{{ models }} [api.{{ models }}.index]
+     */
     public function index(Request $request): JsonResponse
     {
         $query = {{ Model }}::query()->select({{ Model }}::column('*'));
@@ -21,35 +24,53 @@ class {{ Model }}Controller extends Controller
         return response()->json($query->get());
     }
 
+    /**
+     * [POST] api/{{ models }} [api.{{ models }}.store]
+     */
     public function store()
     {
 
     }
 
+    /**
+     * [GET|HEAD] api/{{ models }}/create [api.{{ models }}.create]
+     */
     public function create()
     {
 
     }
 
+    /**
+     * [GET|HEAD] api/{{ models }}/{{{ model }}} [api.{{ models }}.show]
+     */
     public function show(Request $request, int ${{ model }}): JsonResponse
     {
-        $item       = {{ Model }}::find($product);
+        $item       = {{ Model }}::find(${{ model }});
         $statusCode = $item ? Response::HTTP_OK : Response::HTTP_NOT_FOUND;
 
         return response()->json($item, $statusCode);
     }
 
-    public function update()
+    /**
+     * [PUT|PATCH] api/{{ models }}/{{{ model }}} [{{ models }}.update]
+     */
+    public function update(Request $request, int ${{ model }})
     {
 
     }
 
-    public function destroy()
+    /**
+     * [DELETE] api/{{ models }}/{{{ model }}} [{{ models }}.destroy]
+     */
+    public function destroy(Request $request, int ${{ model }})
     {
 
     }
 
-    public function edit()
+    /**
+     * [GET|HEAD] api/{{ models }}/{{{ model }}} [{{ models }}.show]
+     */
+    public function edit(Request $request, int ${{ model }})
     {
 
     }

@@ -124,7 +124,11 @@ class BakeModelAPICommand extends AbstractBakeCommand
     private function addResourceRoute(string $model): void
     {
         $content = PHP_EOL . '// ' . $model . PHP_EOL;
-        $content .= sprintf('Route::resource(\'%s\', App\Http\Controllers\Api\%sController::class, [\'as\' => \'api\']);', Str::snake($model), $model);
+        $content .= sprintf(
+            'Route::resource(\'%s\', App\Http\Controllers\Api\%sController::class, [\'as\' => \'api\']);',
+            Str::plural(Str::snake($model)),
+            $model
+        );
 
         if (File::append(base_path('routes/api.php'), $content) !== false) {
             $this->info('Added resource routes to "routes/api.php".');
