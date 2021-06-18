@@ -1,11 +1,10 @@
 <?php
 return [
     'SampleModel' => [
-        'tags'       => [],
         'table'      => '',
         'columns'    => [
             'id'                 => 'integer|unsigned|ai',
-            'uuid' => 'uuid|unique',
+            'uuid'               => 'uuid|unique',
             'foreign_id'         => 'fk',
             'column_with_values' => 'varchar|length:10',
         ],
@@ -18,5 +17,6 @@ return [
         'label'      => false,
         'timestamps' => false,
         'useUuid'    => true,
+        'tags'       => [],
     ],
 ];

@@ -2,9 +2,7 @@
 
 namespace SimKlee\LaravelBakery\Console\Commands;
 
-use File;
 use Illuminate\Support\Carbon;
-use SimKlee\LaravelBakery\File\ConsoleFileHelper;
 use SimKlee\LaravelBakery\Generator\MigrationWriter;
 use SimKlee\LaravelBakery\Generator\ModelFactoryWriter;
 use SimKlee\LaravelBakery\Generator\ModelRepositoryWriter;
@@ -23,20 +21,10 @@ class BakeModel extends AbstractBake
     protected $signature = 'bake:model {model?}
                                        {--all : Generate all models in config file}
                                        {--config= : Define the config file name (without file extension .php)}
-                                       {--sample : Create a sample config file}
                                        {--force : Override existing files!}';
 
     /** @var string */
     protected $description = 'Bake a new model from a config file.';
-
-    public function handle(): int
-    {
-        if ($this->option(self::OPTION_SAMPLE)) {
-            return $this->createSample();
-        }
-
-        return parent::handle();
-    }
 
     protected function handleModel(string $model, Carbon $timestamp = null): int
     {
@@ -73,28 +61,6 @@ class BakeModel extends AbstractBake
             ),
             'model migration'
         );
-
-        return 0;
-    }
-
-    /**
-     * @return int
-     */
-    private function createSample(): int
-    {
-        $file = config_path($this->configFile);
-
-        try {
-            if ($this->fileHelper->put($file, File::get(ConsoleFileHelper::getResourcePath('config_sample.stub')))) {
-                $this->info(sprintf('Written config sample into "%s" successfully.', $file));
-            } else {
-                $this->warn(sprintf('Skipped writing config sample into "%s".', $file));
-            }
-        } catch (FileNotFoundException $e) {
-            $this->error($e->getMessage());
-
-            return 1;
-        }
 
         return 0;
     }
