@@ -6,9 +6,6 @@ use File;
 use Illuminate\Support\ServiceProvider;
 use SimKlee\LaravelBakery\Console\Commands\BakeModel;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelAPI;
-use SimKlee\LaravelBakery\Console\Commands\BakeModelAPICommand;
-use SimKlee\LaravelBakery\Console\Commands\BakeModelCommand;
-use SimKlee\LaravelBakery\Console\Commands\BakeModelCRUDCommand;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelViews;
 use SimKlee\LaravelBakery\Console\Commands\InstallBakery;
 
