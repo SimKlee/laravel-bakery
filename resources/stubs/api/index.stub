@@ -1,0 +1,9 @@
+    /**
+     * @param Request $request
+     *
+     * @return AnonymousResourceCollection
+     */
+    public function index(Request $request): AnonymousResourceCollection
+    {
+        return {{ Model }}Resource::collection({{ Model }}::all());
+    }

@@ -16,7 +16,18 @@ return [
         ],
         'label'      => false,
         'timestamps' => false,
+        'softDelete' => false,
         'useUuid'    => true,
         'tags'       => [],
+        'api'        => [
+            'index'   => true,
+            'create'  => true,
+            'show'    => true,
+            'update'  => true,
+            'destroy' => true,
+        ],
+        'frontend' => [
+            'index'   => true,
+        ],
     ],
 ];

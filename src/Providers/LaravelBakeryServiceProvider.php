@@ -4,6 +4,7 @@ namespace SimKlee\LaravelBakery\Providers;
 
 use File;
 use Illuminate\Support\ServiceProvider;
+use SimKlee\LaravelBakery\Console\Commands\BakeCleanup;
 use SimKlee\LaravelBakery\Console\Commands\BakeModel;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelAPI;
 use SimKlee\LaravelBakery\Console\Commands\BakeModelViews;
@@ -21,6 +22,7 @@ class LaravelBakeryServiceProvider extends ServiceProvider
                 BakeModel::class,
                 BakeModelAPI::class,
                 BakeModelViews::class,
+                BakeCleanup::class,
             ]);
 
             // config files
@@ -63,6 +65,7 @@ class LaravelBakeryServiceProvider extends ServiceProvider
             app_path('Models/Repositories'),
             app_path('Models/Traits'),
             app_path('Http/Requests'),
+            app_path('Http/Resources'),
             app_path('View/Components'),
             app_path('Rules'),
             resource_path('views/components'),
@@ -88,6 +91,7 @@ class LaravelBakeryServiceProvider extends ServiceProvider
             __DIR__ . '/../../resources/classes/UuidTrait.php'                 => app_path('Models/Traits/UuidTrait.php'),
             __DIR__ . '/../../resources/classes/AbstractRepository.php'        => app_path('Models/Repositories/AbstractRepository.php'),
             __DIR__ . '/../../resources/classes/AbstractModelStoreRequest.php' => app_path('Http/Requests/AbstractModelStoreRequest.php'),
+            __DIR__ . '/../../resources/classes/AbstractResource.php'          => app_path('Http/Resources/AbstractResource.php'),
         ], 'classes');
     }
 
