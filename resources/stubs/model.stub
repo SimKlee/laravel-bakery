@@ -8,9 +8,11 @@ namespace App\Models;
  *
 {{ properties }}
  *
+ * Methods
  * @method static {{ Model }} find(mixed $id, array $columns = [])
  * @method static {{ Model }} create(array $attributes = [])
  * @method static {{ Model }} firstOrCreate(array $attributes = [], array $values = [])
+{{ classMethods }}
  */
 class {{ Model }} extends {{ extends }}
 {
@@ -56,11 +58,6 @@ class {{ Model }} extends {{ extends }}
     protected $casts = [
 {{ casts }}
     ];
-
-    public function getRouteKeyName(): string
-    {
-        return self::PROPERTY_{{ RouteKeyName }};
-    }
 
 {{ relations }}
 }

@@ -93,7 +93,7 @@ class BakeCleanup extends AbstractBake
             base_path('routes/web.php'),
         ])->each(function (string $routeFile) use ($model) {
             try {
-                $this->removeModelRoutes($model, $routeFile);
+                File::put($routeFile, $this->removeModelRoutes($model, $routeFile));
             } catch (FileNotFoundException $e) {
                 $this->error($e->getMessage());
             }

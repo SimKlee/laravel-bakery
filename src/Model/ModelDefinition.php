@@ -18,7 +18,7 @@ class ModelDefinition
 {
     public string      $model;
     public bool        $timestamps     = false;
-    public bool        $useUuid     = false;
+    public bool        $useUuid        = false;
     public bool        $timeRestricted = false;
     public array       $values         = [];
     public string      $table;
@@ -80,6 +80,9 @@ class ModelDefinition
                 $column->values = $this->values[ $name ];
             }
             $this->addColumn($column);
+            if ($column->primaryKey && $this->useUuid) {
+                $this->addColumn(ColumnParser::parse($this->model, 'uuid', 'uuid|unique'));
+            }
         });
     }
 

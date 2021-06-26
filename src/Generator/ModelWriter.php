@@ -4,6 +4,7 @@ namespace SimKlee\LaravelBakery\Generator;
 
 use Illuminate\Support\Collection;
 use SimKlee\LaravelBakery\Generator\Formatter\Model\ClassConstantsStrings;
+use SimKlee\LaravelBakery\Generator\Formatter\Model\ClassMethodStrings;
 use SimKlee\LaravelBakery\Generator\Formatter\Model\ClassPropertyStrings;
 use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelCasts;
 use SimKlee\LaravelBakery\Generator\Formatter\Model\ModelDates;
@@ -52,7 +53,7 @@ class ModelWriter extends AbstractWriter
         $this->setVar('dates', (new ModelDates($this->modelDefinition))->toString());
         $this->setVar('valueConstants', (new ModelValueConstants($this->modelDefinition))->toString());
         $this->setVar('relations', (new ModelRelations($this->modelDefinition))->toString());
-        $this->setVar('RouteKeyName', $this->modelDefinition->useUuid ? 'UUID' : 'ID');
+        $this->setVar('classMethods', (new ClassMethodStrings($this->modelDefinition))->toString());
     }
 
     private function setClassUses(string $extends): void
@@ -97,6 +98,14 @@ class ModelWriter extends AbstractWriter
 
     private function getGuarded(): string
     {
-        return '        self::PROPERTY_ID,';
+        $columns = collect(['self::PROPERTY_ID']);
+
+        if ($this->modelDefinition->useUuid) {
+            $columns->add('self::PROPERTY_UUID');
+        }
+
+        return $columns->map(function (string $column) {
+            return sprintf('        %s,', $column);
+        })->implode(PHP_EOL);
     }
 }
