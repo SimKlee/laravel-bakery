@@ -167,4 +167,13 @@ abstract class AbstractBake extends Command
 
     abstract protected function handleModel(string $model, Carbon $timestamp = null): int;
 
+    protected function debug(string $message): void
+    {
+        $this->line(sprintf('<fg=yellow>%s</>', $message));
+    }
+
+    protected function title(string $message): void
+    {
+        $this->line(sprintf('<fg=blue>%s</>', $message));
+    }
 }

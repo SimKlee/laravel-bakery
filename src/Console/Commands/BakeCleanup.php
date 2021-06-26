@@ -28,7 +28,7 @@ class BakeCleanup extends AbstractBake
 
     protected function handleModel(string $model, Carbon $timestamp = null): int
     {
-        $this->info('Cleanup ' . $model);
+        $this->title(sprintf('Cleanup model "%s" ...', $model));
 
         $classes = collect([
             app_path(sprintf('Http/Controllers/Api/%sController.php', $model)),
@@ -44,7 +44,7 @@ class BakeCleanup extends AbstractBake
             if (File::exists($file)) {
                 $this->askAndDelete($file);
             } else {
-                $this->info(sprintf('File "%s" was not generated.', $file));
+                $this->debug(sprintf('File "%s" was not generated.', $file));
             }
         });
 
@@ -56,7 +56,7 @@ class BakeCleanup extends AbstractBake
 
     private function findAndDeleteMigration(string $model)
     {
-        $this->info('Searching for migration ...');
+        $this->title('Searching for migration ...');
         $search = sprintf('create_%s_table', Str::snake($model));
         collect(File::files(base_path('database/migrations/')))->each(function (SplFileInfo $file) use ($search) {
             if (strpos($file->getFilename(), $search) !== false) {
@@ -78,16 +78,20 @@ class BakeCleanup extends AbstractBake
                     ['y' => 'yes', 'n' => 'no'],
                     'no'
                 ) === 'y';
+        } else {
+            $delete = true;
         }
 
-        if ($delete) {
-            File::delete($file);
+        if ($delete && File::delete($file)) {
+            $this->info(sprintf('File "%s" deleted!', $file));
+        } else {
+            $this->error(sprintf('Deleting "%s" failed!', $file));
         }
     }
 
     private function cleanRoutes(string $model): void
     {
-        $this->info('Removing routes ...');
+        $this->title('Removing routes ...');
         collect([
             base_path('routes/api.php'),
             base_path('routes/web.php'),
