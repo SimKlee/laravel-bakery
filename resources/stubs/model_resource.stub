@@ -11,6 +11,10 @@ use Illuminate\Http\Request;
  */
 class {{ Model }}Resource extends AbstractResource
 {
+    protected bool   $withDates = false;
+    protected bool   $withLinks = false;
+    protected string $name      = '{{ model }}';
+
     /**
      * @param Request $request
      *

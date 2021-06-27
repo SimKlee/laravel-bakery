@@ -1,0 +1,11 @@
+    /**
+     * [POST] api/{{ models }} [api.{{ models }}.store]
+     */
+    public function store(Request $request): {{ Model }}Resource
+    {
+        ${{ model }} = {{ Model }}::create([
+            // @TODO
+        ]);
+
+        return new {{ Model }}Resource(${{ model }});
+    }

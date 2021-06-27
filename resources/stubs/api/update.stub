@@ -1,0 +1,10 @@
+    /**
+     * [PUT|PATCH] api/{{ models }}/{{{ model }}} [{{ models }}.update]
+     */
+    public function update(Request $request, {{ Model }} ${{ model }}): {{ Model }}Resource
+    {
+        // @TODO: check if all fields should be accessed
+        ${{ model }}->update($request->all());
+
+        return new {{ Model }}Resource(${{ model }});
+    }

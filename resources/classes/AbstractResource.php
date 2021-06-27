@@ -5,10 +5,14 @@ namespace App\Http\Resources;
 use App\Models\AbstractModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Str;
 
 abstract class AbstractResource extends JsonResource
 {
     protected bool $withDates = false;
+    protected bool $withLinks = false;
+
+    protected string $name = '';
 
     /**
      * @param Request $request
@@ -17,7 +21,20 @@ abstract class AbstractResource extends JsonResource
      */
     public function toArray($request): array
     {
-        return $this->withTimestamps($request, parent::toArray($request));
+        $result = parent::toArray($request);
+        $result = $this->withLinks($request, $result);
+        $result = $this->withTimestamps($request, $result);
+
+        return $result;
+    }
+
+    private function withLinks(Request $request, array $result): array
+    {
+        if (isset($this->uuid) && ($this->withLinks || ($request->has('links') && $request->get('links')) == 1)) {
+            $result['links'] = [
+                'show' => route(sprintf('%s.show', Str::plural($this->name)), [$this->name => $this->uuid]),
+            ];
+        }
     }
 
     private function withTimestamps(Request $request, array $result): array

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\{{ Model }}Resource;
 use App\Models\{{ Model }};
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -15,52 +14,15 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
  */
 class {{ Model }}Controller extends Controller
 {
-    /**
-     * [GET|HEAD] api/{{ models }} [api.{{ models }}.index]
-     */
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        return {{ Model }}Resource::collection({{ Model }}::all());
-    }
 
-    /**
-     * [POST] api/{{ models }} [api.{{ models }}.store]
-     */
-    public function store(Request $request): {{ Model }}Resource
-    {
-        ${{ model }} = {{ Model }}::create([
-            // @TODO
-        ]);
+{{ indexMethod }}
 
-        return new {{ Model }}Resource(${{ model }});
-    }
+{{ showMethod }}
 
-    /**
-     * [GET|HEAD] api/{{ models }}/{{{ model }}} [api.{{ models }}.show]
-     */
-    public function show({{ Model }} ${{ model }}): {{ Model }}Resource
-    {
-        return new {{ Model }}Resource(${{ model }});
-    }
+{{ storeMethod }}
 
-    /**
-     * [PUT|PATCH] api/{{ models }}/{{{ model }}} [{{ models }}.update]
-     */
-    public function update(Request $request, {{ Model }} ${{ model }}): {{ Model }}Resource
-    {
-        // @TODO: check if all fields should be accessed
-        ${{ model }}->update($request->all());
+{{ updateMethod }}
 
-        return new {{ Model }}Resource(${{ model }});
-    }
+{{ destroyMethod }}
 
-    /**
-     * [DELETE] api/{{ models }}/{{{ model }}} [{{ models }}.destroy]
-     */
-    public function destroy({{ Model }} ${{ model }}): JsonResponse
-    {
-        ${{ model }}->delete();
-
-        return response()->json(null, 204);
-    }
 }

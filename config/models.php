@@ -23,11 +23,12 @@ return [
             'index'   => true,
             'create'  => true,
             'show'    => true,
+            'store'   => true,
             'update'  => true,
             'destroy' => true,
         ],
-        'frontend' => [
-            'index'   => true,
+        'frontend'   => [
+            'index' => true,
         ],
     ],
 ];

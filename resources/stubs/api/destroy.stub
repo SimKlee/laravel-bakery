@@ -1,0 +1,9 @@
+    /**
+     * [DELETE] api/{{ models }}/{{{ model }}} [{{ models }}.destroy]
+     */
+    public function destroy({{ Model }} ${{ model }}): {{ Model }}Resource
+    {
+        ${{ model }}->delete();
+
+        return new {{ Model }}Resource(null);
+    }

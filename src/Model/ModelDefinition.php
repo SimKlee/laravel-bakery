@@ -25,6 +25,12 @@ class ModelDefinition
     public ?string     $label          = null;
     private Collection $columnBag;
     public Collection  $relations;
+    public bool        $apiIndex       = false;
+    public bool        $apiCreate      = false;
+    public bool        $apiShow        = false;
+    public bool        $apiStore        = false;
+    public bool        $apiUpdate      = false;
+    public bool        $apiDestroy     = false;
 
     public function __construct()
     {
@@ -62,6 +68,15 @@ class ModelDefinition
 
         if (isset($config['useUuid']) && $config['useUuid'] === true) {
             $instance->useUuid = true;
+        }
+
+        if (isset($config['api'])) {
+            $instance->apiIndex   = $config['api']['index'] ?? false;
+            $instance->apiCreate  = $config['api']['create'] ?? false;
+            $instance->apiStore    = $config['api']['store'] ?? false;
+            $instance->apiShow    = $config['api']['show'] ?? false;
+            $instance->apiUpdate  = $config['api']['update'] ?? false;
+            $instance->apiDestroy = $config['api']['destroy'] ?? false;
         }
 
         $instance->addColumnDefinitions($config['columns']);

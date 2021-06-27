@@ -19,6 +19,7 @@ class ModelResourceWriter extends AbstractWriter
     protected function handleVars(): void
     {
         $this->setVar('Model', $this->modelDefinition->getModel());
+        $this->setVar('model', $this->modelDefinition->getModel(true));
         // @TODO: ask for default implementation (parent::toArray($request)) or list all columns
         #$this->setVar('data', $this->getData());
     }

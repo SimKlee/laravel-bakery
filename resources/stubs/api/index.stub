@@ -1,7 +1,5 @@
     /**
-     * @param Request $request
-     *
-     * @return AnonymousResourceCollection
+     * [GET|HEAD] api/definitions [api.definitions.index]
      */
     public function index(Request $request): AnonymousResourceCollection
     {

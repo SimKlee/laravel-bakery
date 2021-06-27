@@ -1,9 +1,7 @@
     /**
-     * @param Request $request
-     *
-     * @return {{ Model }}Resource
+     * [GET|HEAD] api/{{ models }}/{{{ model }}} [api.{{ models }}.show]
      */
-    public function show(Request $request, {{ Model }} ${{ model }}): {{ Model }}Resource
+    public function show({{ Model }} ${{ model }}): {{ Model }}Resource
     {
         return new {{ Model }}Resource(${{ model }});
     }
