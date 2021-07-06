@@ -28,7 +28,7 @@ class ModelDefinition
     public bool        $apiIndex       = false;
     public bool        $apiCreate      = false;
     public bool        $apiShow        = false;
-    public bool        $apiStore        = false;
+    public bool        $apiStore       = false;
     public bool        $apiUpdate      = false;
     public bool        $apiDestroy     = false;
 
@@ -73,7 +73,7 @@ class ModelDefinition
         if (isset($config['api'])) {
             $instance->apiIndex   = $config['api']['index'] ?? false;
             $instance->apiCreate  = $config['api']['create'] ?? false;
-            $instance->apiStore    = $config['api']['store'] ?? false;
+            $instance->apiStore   = $config['api']['store'] ?? false;
             $instance->apiShow    = $config['api']['show'] ?? false;
             $instance->apiUpdate  = $config['api']['update'] ?? false;
             $instance->apiDestroy = $config['api']['destroy'] ?? false;
@@ -103,7 +103,13 @@ class ModelDefinition
 
     public function addColumn(Column $column): void
     {
-        $this->columnBag->add($column);
+        $notExists = $this->columnBag->filter(function (Column $existingColumn) use ($column) {
+                return $existingColumn->name === $column->name;
+            })->count() === 0;
+
+        if ($notExists) {
+            $this->columnBag->add($column);
+        }
     }
 
     /**

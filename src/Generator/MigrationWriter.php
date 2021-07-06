@@ -2,7 +2,7 @@
 
 namespace SimKlee\LaravelBakery\Generator;
 
-use SimKlee\LaravelBakery\Generator\Formatter\ColumnHelper\ColumnIndexes;
+use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ColumnIndexes;
 use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ForeignKeys;
 use SimKlee\LaravelBakery\Generator\Formatter\Migrations\ColumnDefinitions;
 use Str;
