@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace SimKlee\LaravelBakery\Generator\Formatter\Migrations\ColumnHelper;
+namespace SimKlee\LaravelBakery\Generator\Formatter\Migrations;
 
 use SimKlee\LaravelBakery\Generator\Formatter\AbstractFormatter;
 use SimKlee\LaravelBakery\Generator\Stub;
