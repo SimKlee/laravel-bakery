@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Repositories\AbstractRepository;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Str;
 
 /**
  * Class AbstractModel
@@ -18,7 +19,7 @@ abstract class AbstractModel extends Model
 {
     use HasFactory;
 
-    const TABLE = null;
+    public const TABLE = null;
 
     public static function column(string $column, string $alias = null): string
     {
@@ -32,6 +33,17 @@ abstract class AbstractModel extends Model
     public function getModelName(): string
     {
         return class_basename($this);
+    }
+
+    public function model2snake(bool $plural = false): string
+    {
+        $name = Str::snake(class_basename($this));
+
+        if ($plural) {
+            $name = Str::plural($name);
+        }
+
+        return $name;
     }
 
     public static function repository(): AbstractRepository
