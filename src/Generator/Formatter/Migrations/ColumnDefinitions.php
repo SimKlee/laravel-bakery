@@ -5,6 +5,7 @@ namespace SimKlee\LaravelBakery\Generator\Formatter\Migrations;
 use Illuminate\Support\Collection;
 use SimKlee\LaravelBakery\Generator\Formatter\AbstractFormatter;
 use SimKlee\LaravelBakery\Generator\Stub;
+use SimKlee\LaravelBakery\Model\Column\ColumnDataType;
 use SimKlee\LaravelBakery\Model\Column\Exceptions\UnknownMethodForDataTypeException;
 use SimKlee\LaravelBakery\Model\Column\Column;
 
@@ -15,19 +16,26 @@ use SimKlee\LaravelBakery\Model\Column\Column;
 class ColumnDefinitions extends AbstractFormatter
 {
     private array $methodMap = [
-        'tinyInteger'   => 'tinyInteger',
-        'integer'       => 'integer',
-        'smallInteger'  => 'smallInteger',
-        'mediumInteger' => 'mediumInteger',
-        'bigInteger'    => 'bigInteger',
-        'varchar'       => 'string',
-        'char'          => 'char',
-        'text'          => 'text',
-        'timestamp'     => 'timestamp',
-        'boolean'       => 'boolean',
-        'decimal'       => 'decimal',
-        'dateTime'      => 'dateTime',
-        'uuid'          => 'uuid',
+        ColumnDataType::DATA_TYPE_TINY_INTEGER   => 'tinyInteger',
+        ColumnDataType::DATA_TYPE_INTEGER        => 'integer',
+        ColumnDataType::DATA_TYPE_SMALL_INTEGER  => 'smallInteger',
+        ColumnDataType::DATA_TYPE_MEDIUM_INTEGER => 'mediumInteger',
+        ColumnDataType::DATA_TYPE_BIG_INTEGER    => 'bigInteger',
+        ColumnDataType::DATA_TYPE_VARCHAR        => 'string',
+        ColumnDataType::DATA_TYPE_CHAR           => 'char',
+        ColumnDataType::DATA_TYPE_TEXT           => 'text',
+        ColumnDataType::DATA_TYPE_MEDIUM_TEXT    => 'mediumText',
+        ColumnDataType::DATA_TYPE_LONG_TEXT      => 'longText',
+        ColumnDataType::DATA_TYPE_JSON           => 'json',
+        ColumnDataType::DATA_TYPE_TIMESTAMP      => 'timestamp',
+        ColumnDataType::DATA_TYPE_BOOLEAN        => 'boolean',
+        ColumnDataType::DATA_TYPE_FLOAT          => 'float',
+        ColumnDataType::DATA_TYPE_DOUBLE         => 'double',
+        ColumnDataType::DATA_TYPE_DECIMAL        => 'decimal',
+        ColumnDataType::DATA_TYPE_DATETIME       => 'dateTime',
+        ColumnDataType::DATA_TYPE_DATE           => 'date',
+        ColumnDataType::DATA_TYPE_UUID           => 'uuid',
+        ColumnDataType::DATA_TYPE_BINARY         => 'binary',
     ];
 
     public function toString(): string

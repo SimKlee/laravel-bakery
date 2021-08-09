@@ -14,14 +14,22 @@ class ColumnIndexes extends AbstractFormatter
 {
     public function toString(): string
     {
-        return $this->modelDefinition
+        $indexes = $this->modelDefinition
             ->getColumns()
             ->filter(function (Column $column) {
                 return $column->index || $column->unique;
-            })
-            ->map(function (Column $column) {
+            });
+
+        if ($indexes->count() > 0) {
+            $header  = PHP_EOL . "\t\t\t" . '// indexes' . PHP_EOL;
+            $content = $indexes->map(function (Column $column) {
                 return $this->getColumnIndexes($column);
             })->implode(PHP_EOL);
+
+            return $header . $content;
+        }
+
+        return '';
     }
 
     private function getColumnIndexes(Column $column): string
@@ -29,14 +37,16 @@ class ColumnIndexes extends AbstractFormatter
         $type = null;
         if ($column->index) {
             $type = 'index';
-        } else if ($column->unique) {
-            $type = 'unique';
+        } else {
+            if ($column->unique) {
+                $type = 'unique';
+            }
         }
 
-        $stub = new Stub('column_index_definition.stub');
+        $stub = new Stub('migrations/column_index_definition.stub');
 
         return $stub->setVar('index', $type)
-            ->setVar('column', $column->getPropertyString())
-            ->getContent();
+                    ->setVar('column', $column->getPropertyString())
+                    ->getContent();
     }
 }

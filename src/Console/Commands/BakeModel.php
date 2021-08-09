@@ -21,7 +21,8 @@ class BakeModel extends AbstractBake
     protected $signature = 'bake:model {model?}
                                        {--all : Generate all models in config file}
                                        {--config= : Define the config file name (without file extension .php)}
-                                       {--force : Override existing files!}';
+                                       {--force : Override existing files!}
+                                       {--sort=key : Sorting of model list: alpha, key}';
 
     /** @var string */
     protected $description = 'Bake a new model from a config file.';

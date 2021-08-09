@@ -14,6 +14,7 @@ class ColumnForeignKeys extends AbstractColumnComponent
     const FOREIGN_KEY_CASCADE   = 'cascade';
     const FOREIGN_KEY_RESTRICT  = 'restrict';
     const FOREIGN_KEY_NO_ACTION = 'no action';
+    const FOREIGN_KEY_SET_NULL  = 'set null';
 
     protected function parseDefinitions(): void
     {
@@ -25,7 +26,7 @@ class ColumnForeignKeys extends AbstractColumnComponent
                     return true;
                 }
 
-                if (!in_array($value, [self::FOREIGN_KEY_CASCADE, self::FOREIGN_KEY_RESTRICT])) {
+                if (!in_array($value, [self::FOREIGN_KEY_CASCADE, self::FOREIGN_KEY_RESTRICT, self::FOREIGN_KEY_NO_ACTION, self::FOREIGN_KEY_SET_NULL])) {
                     throw new \Exception(sprintf('Unknown value "%s"', $value));
                 }
 

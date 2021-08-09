@@ -20,6 +20,10 @@ abstract class AbstractBake extends Command
     protected const OPTION_ALL     = 'all';
     protected const OPTION_FORCE   = 'force';
     protected const OPTION_CONFIG  = 'config';
+    protected const OPTION_SORT    = 'sort';
+
+    protected const SORT_ALPHA = 'alpha';
+    protected const SORT_KEY   = 'key';
 
     protected ?ConsoleFileHelper   $fileHelper          = null;
     protected string               $configFile          = 'models.php';
@@ -32,22 +36,28 @@ abstract class AbstractBake extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->fileHelper          = new ConsoleFileHelper($this);
+        $this->fileHelper = new ConsoleFileHelper($this);
     }
 
     /**
      * @return array
      */
-    protected function getModels(): array
+    protected function getModels(string $sort = self::SORT_KEY): array
     {
-        return collect(array_keys($this->configuration))->map(function (string $model, int $i) {
+        $models = collect(array_keys($this->configuration))->map(function (string $model, int $i) {
             $modelPublished      = (int) class_exists('\\App\\Models\\' . $model);
             $controllerPublished = (int) class_exists('\\App\\Http\\Controllers\\' . $model . 'Controller');
 
             return [$i, $model, $modelPublished, $controllerPublished];
-        })->sortBy(function (array $data) {
-            return $data[1];
-        })->toArray();
+        });
+
+        if ($sort === self::SORT_ALPHA) {
+            $models->sortBy(function (array $data) {
+                return $data[1];
+            });
+        }
+
+        return $models->toArray();
     }
 
     /**
@@ -123,6 +133,7 @@ abstract class AbstractBake extends Command
         }
 
         $this->error(sprintf('Generating %s "%s" failed!', $type, $file));
+
         return false;
     }
 
@@ -162,7 +173,13 @@ abstract class AbstractBake extends Command
             $model = $this->askForModel();
         }
 
-        return $this->handleModel($model);
+        $this->handleModel($model);
+
+        if ($this->option(self::OPTION_LOOP)) {
+            $this->handle();
+        }
+
+        return 1;
     }
 
     abstract protected function handleModel(string $model, Carbon $timestamp = null): int;

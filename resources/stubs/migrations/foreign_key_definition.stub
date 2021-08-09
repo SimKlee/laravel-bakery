@@ -1,3 +1,5 @@
             $table->foreign({{ column }}, '{{ name }}')
                 ->on(\App\Models\{{ ForeignModel }}::TABLE)
-                ->references(\App\Models\{{ ForeignColumn }});
+                ->references(\App\Models\{{ ForeignColumn }})
+                ->onUpdate('{{ onUpdate }}')
+                ->onDelete('{{ onDelete }}');

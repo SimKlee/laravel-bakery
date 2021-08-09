@@ -28,13 +28,11 @@ class Column
     public            $default;
     public bool       $foreignKey         = false;
     public ?Column    $foreignKeyColumn   = null;
-    public ?string    $foreignKeyOnUpdate = null;
-    public ?string    $foreignKeyOnDelete = null;
+    public ?string    $foreignKeyOnUpdate = 'restrict';
+    public ?string    $foreignKeyOnDelete = 'restrict';
     public Collection $definitions;
 
     /**
-     * Column constructor.
-     *
      * @param string     $model
      * @param string     $column
      * @param Collection $definitions
@@ -46,9 +44,6 @@ class Column
         $this->definitions = $definitions;
     }
 
-    /**
-     * @return string
-     */
     public function getPropertyString(): string
     {
         return sprintf('%s::PROPERTY_%s', $this->model, strtoupper($this->name));
